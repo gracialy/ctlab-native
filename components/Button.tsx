@@ -1,43 +1,48 @@
-import { TouchableOpacity, Text, View, StyleSheet } from 'react-native';
+import { TouchableOpacity, Text, View, StyleSheet, ViewStyle, Pressable } from 'react-native';
 import { theme } from '@/constants/Theme';
 
 type ButtonProps = {
   title: string;
   onPress: () => void;
+  icon?: React.ReactNode;
   variant?: 'primary' | 'secondary';
   disabled?: boolean;
-  icon?: React.ReactNode;
+  style?: ViewStyle;
   iconPosition?: 'left' | 'right';
 };
 
 export function Button({ 
   title, 
   onPress, 
+  icon,
   variant = 'primary',
   disabled = false,
-  icon,
+  style,
   iconPosition = 'left'
 }: ButtonProps) {
   return (
-    <TouchableOpacity 
+    <Pressable 
       style={[
-        styles.button, 
+        styles.button,
         variant === 'secondary' && styles.buttonSecondary,
-        disabled && styles.buttonDisabled
+        disabled && styles.buttonDisabled,
+        style
       ]} 
       onPress={onPress}
       disabled={disabled}
     >
-      {icon && iconPosition === 'left' && <View style={styles.iconLeft}>{icon}</View>}
-      <Text style={[
-        styles.buttonText,
-        variant === 'secondary' && styles.buttonTextSecondary,
-        disabled && styles.buttonTextDisabled
-      ]}>
-        {title}
-      </Text>
-      {icon && iconPosition === 'right' && <View style={styles.iconRight}>{icon}</View>}
-    </TouchableOpacity>
+      {iconPosition === 'left' && icon}
+      {title && (
+        <Text style={[
+          styles.buttonText,
+          variant === 'secondary' && styles.buttonTextSecondary,
+          disabled && styles.buttonTextDisabled
+        ]}>
+          {title}
+        </Text>
+      )}
+      {iconPosition === 'right' && icon}
+    </Pressable>
   );
 }
 

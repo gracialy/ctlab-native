@@ -29,7 +29,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           return;
         }
 
-        console.log(`[${Platform.OS}] Initial session:`, currentSession);
+        // console.log(`[${Platform.OS}] Initial session:`, currentSession);
         setSession(currentSession);
       } catch (error) {
         console.error('Failed to initialize auth:', error);
