@@ -15,7 +15,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.gracialy.uas"
     },
     "web": {
       "bundler": "metro",
@@ -36,6 +37,15 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "8e0b54f0-b70c-4a83-a0d2-f205961aea56"
+      }
+    },
+    "owner": "gracialy"
   }
 }
