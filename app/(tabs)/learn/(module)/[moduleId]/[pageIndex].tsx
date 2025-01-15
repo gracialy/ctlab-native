@@ -225,6 +225,7 @@ const styles = StyleSheet.create({
     borderTopColor: '#E5E7EB',
     backgroundColor: theme.colors.surface,
     justifyContent: 'space-between', // Space buttons apart
+    alignItems: 'center', // Center vertically
     position: 'absolute', // Fix position
     bottom: 0, // Stick to bottom
     left: 0,

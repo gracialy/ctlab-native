@@ -38,6 +38,15 @@ export default function TabLayout() {
           href: '/(tabs)/learn',
         }}
       />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: 'Profile',
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="person" size={24} color={color} />
+          ),
+        }}
+      />
     </Tabs>
   );
 }

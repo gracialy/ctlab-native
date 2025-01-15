@@ -24,7 +24,7 @@ export default function LearnIndex() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>CTLab Modules</Text>
+      <Text style={styles.title}>Modules</Text>
       <FlatList
         data={modules}
         keyExtractor={(item) => item.id}
