@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Pressable, ScrollView, useWindowDimensions, ViewStyle } from 'react-native';
+import { View, Text, StyleSheet, Pressable, ScrollView, useWindowDimensions } from 'react-native';
 import { theme } from '@/constants/Theme';
 import { useState, useRef, ComponentProps } from 'react';
 import { Ionicons } from '@expo/vector-icons';
@@ -6,19 +6,22 @@ import { Cell, CellStyleMap, Command, GameState } from '@/types/game';
 import { Button } from '@/components/Button';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+type WallHighlight = { x: number; y: number } | null;
+type IconName = ComponentProps<typeof Ionicons>['name'];
+
 export default function Lab() {  
   const initialMap: Cell[][] = [
-    ['wall', 'wall', 'wall', 'wall', 'wall', 'wall', 'wall', 'wall', 'wall', 'wall', 'wall'],
-    ['wall', 'pacman', 'pellet', 'pellet', 'pellet', 'pellet', 'pellet', 'pellet', 'pellet', 'pellet', 'wall'],
-    ['wall', 'pellet', 'wall', 'wall', 'pellet', 'wall', 'pellet', 'wall', 'wall', 'pellet', 'wall'],
-    ['wall', 'pellet', 'wall', 'pellet', 'pellet', 'pellet', 'pellet', 'pellet', 'wall', 'pellet', 'wall'],
-    ['wall', 'pellet', 'pellet', 'pellet', 'wall', 'ghost', 'wall', 'pellet', 'pellet', 'pellet', 'wall'],
-    ['wall', 'wall', 'wall', 'pellet', 'wall', 'empty', 'wall', 'pellet', 'wall', 'wall', 'wall'],
-    ['wall', 'pellet', 'pellet', 'pellet', 'wall', 'wall', 'wall', 'pellet', 'pellet', 'pellet', 'wall'],
-    ['wall', 'pellet', 'wall', 'pellet', 'pellet', 'pellet', 'pellet', 'pellet', 'wall', 'pellet', 'wall'],
-    ['wall', 'pellet', 'wall', 'wall', 'pellet', 'wall', 'pellet', 'wall', 'wall', 'pellet', 'wall'],
-    ['wall', 'pellet', 'pellet', 'pellet', 'pellet', 'pellet', 'pellet', 'pellet', 'pellet', 'pellet', 'wall'],
-    ['wall', 'wall', 'wall', 'wall', 'wall', 'wall', 'wall', 'wall', 'wall', 'wall', 'wall'],
+    ['wall', 'wall',   'wall',   'wall',   'wall',   'wall',   'wall',   'wall',   'wall',   'wall',   'wall'],
+    ['wall', 'ghost',  'pellet', 'pellet', 'pellet', 'pellet', 'pellet', 'pellet', 'pellet', 'pellet', 'wall'],
+    ['wall', 'pellet', 'wall',   'wall',   'pellet', 'wall',   'pellet', 'wall',   'wall',   'pellet', 'wall'],
+    ['wall', 'pellet', 'wall',   'pellet', 'pellet', 'pellet', 'pellet', 'pellet', 'wall',   'pellet', 'wall'],
+    ['wall', 'pellet', 'pellet', 'pellet', 'wall',   'pellet',  'wall',   'pellet', 'pellet', 'pellet', 'wall'],
+    ['wall', 'pellet', 'wall',   'pellet', 'pellet', 'pacman', 'pellet',  'pellet', 'wall',   'pellet', 'wall'],
+    ['wall', 'pellet', 'pellet', 'pellet', 'wall',   'pellet',  'wall',   'pellet', 'pellet', 'pellet', 'wall'],
+    ['wall', 'pellet', 'wall',   'pellet', 'pellet', 'pellet', 'pellet', 'pellet', 'wall',   'pellet', 'wall'],
+    ['wall', 'pellet', 'wall',   'wall',   'pellet', 'wall',   'pellet', 'wall',   'wall',   'pellet', 'wall'],
+    ['wall', 'pellet', 'pellet', 'pellet', 'pellet', 'pellet', 'pellet', 'pellet', 'pellet', 'ghost',  'wall'],
+    ['wall', 'wall',   'wall',   'wall',   'wall',   'wall',   'wall',   'wall',   'wall',   'wall',   'wall'],
   ];
 
   const { width } = useWindowDimensions();
@@ -26,31 +29,95 @@ export default function Lab() {
 
   const [gameState, setGameState] = useState<GameState>({
     map: initialMap,
-    pacman: { x: 1, y: 1 }, // Starting position from the map
-    ghosts: [{ x: 5, y: 4 }], // Ghost position from the map
+    pacman: { x: 5, y: 5 }, // Starting position from the map
+    ghosts: [{ x: 1, y: 1 }, { x: 10, y: 10 }], // Ghost position from the map
     lives: 3,
     score: 0,
     iterations: 20,
     commands: []
   });
 
-  const [selectedCell, setSelectedCell] = useState<Cell>('wall');
   const [isRunning, setIsRunning] = useState(false);
+  const [wallHighlight, setWallHighlight] = useState<WallHighlight>(null);
 
-  const handleCellPress = (x: number, y: number) => {
-    const newMap = gameState.map.map(row => [...row]);
-    newMap[y][x] = selectedCell;
-    setGameState({ ...gameState, map: newMap });
-  };
+  const handleRun = async () => {
+    if (gameState.iterations <= 0) {
+        alert('No more iterations left!');
+        return;
+    }
 
-  const handleRun = () => {
+    if (gameState.lives <= 0) {
+        alert('Game Over - No more lives!');
+        return;
+    }
+
     setIsRunning(true);
-    // TODO: Implement game logic and command execution
+    const newMap = [...gameState.map];
+    let currentPos = { ...gameState.pacman };
+    let currentScore = gameState.score;
+    let wallHit = false;
+
+    // Execute each command
+    for (const command of gameState.commands) {
+      if (wallHit) break;
+
+      await new Promise(resolve => setTimeout(resolve, 500)); // Animation delay
+      
+      let newX = currentPos.x;
+      let newY = currentPos.y;
+  
+      switch (command) {
+        case 'left': newX--; break;
+        case 'right': newX++; break;
+        case 'up': newY--; break;
+        case 'down': newY++; break;
+      }
+
+      // Check if move hits wall
+      if (newMap[newY][newX] === 'wall') {
+        wallHit = true;
+        currentScore = Math.max(0, currentScore - 5); // Prevent negative score
+        
+        // Highlight wall
+        setWallHighlight({ x: newX, y: newY });
+        await new Promise(resolve => setTimeout(resolve, 300));
+        setWallHighlight(null);
+      } 
+      else {
+        // Check if pellet and update score
+        if (newMap[newY][newX] === 'pellet') {
+            currentScore += 10;
+        }
+
+        // Update map
+        newMap[currentPos.y][currentPos.x] = 'empty';
+        newMap[newY][newX] = 'pacman';
+        currentPos = { x: newX, y: newY };
+        
+        setGameState(prev => ({
+          ...prev,
+          map: newMap,
+          pacman: currentPos,
+          score: currentScore
+        }));
+      }
+    }
+
+    // Updates after all commands are executed
+    setGameState(prev => ({
+        ...prev,
+        commands: [], // Reset commands array
+        iterations: prev.iterations - 1,
+        score: currentScore,
+        lives: wallHit ? prev.lives - 1 : prev.lives,
+    }));
+    
+    setIsRunning(false);
   };
 
   const handleAbort = () => {
     setIsRunning(false);
-    // TODO: Stop command execution
+    // Reset to initial state if needed
   };
 
   const handleSave = async () => {
@@ -91,26 +158,6 @@ export default function Lab() {
     setGameState({ ...gameState, commands: newCommands });
   };
 
-  const cellStyles: CellStyleMap = {
-    wall: {
-      backgroundColor: '#374151',
-    },
-    empty: {
-      backgroundColor: '#F3F4F6',
-    },
-    pellet: {
-      backgroundColor: 'transparent',
-    },
-    ghost: {
-      backgroundColor: 'transparent',
-    },
-    pacman: {
-      backgroundColor: 'transparent',
-    },
-  };
-
-  type IconName = ComponentProps<typeof Ionicons>['name'];
-
   // Define a mapping for command to icon names
   const commandToIcon: Record<Command, IconName> = {
     'left': 'caret-back',
@@ -119,16 +166,37 @@ export default function Lab() {
     'down': 'caret-down'
   };
 
-  const renderCell = (cell: Cell, x: number, y: number) => (
-    <Pressable 
-      style={[styles.cell, cellStyles[cell]]}
-      onPress={() => handleCellPress(x, y)}
-    >
-      {cell === 'pacman' && <Ionicons name="ellipse" size={20} color="yellow" />}
-      {cell === 'ghost' && <Ionicons name="warning" size={20} color="red" />}
-      {cell === 'pellet' && <View style={styles.pellet} />}
-    </Pressable>
-  );
+  const renderCell = (cell: Cell, x: number, y: number) => {
+    let content = null;
+    
+    switch (cell) {
+      case 'pacman':
+        content = <Ionicons name="ellipse" size={20} color="yellow" />;
+        break;
+      case 'ghost':
+        content = <Ionicons name="logo-snapchat" size={20} color="red" />;
+        break;
+      case 'pellet':
+        content = <View style={styles.pellet} />;
+        break;
+      case 'wall':
+      case 'empty':
+        content = null;
+        break;
+    }
+
+    const isHighlighted = wallHighlight?.x === x && wallHighlight?.y === y;
+  
+    return (
+        <View style={[
+            styles.cell, 
+            cell === 'wall' && (isHighlighted ? styles.highlightedWall : styles.wall),
+            cell === 'empty' && styles.empty
+        ]}>
+            {content}
+        </View>
+    );
+  };
   
   // Update where command icons are rendered
   const renderCommand = (command: Command, index: number) => (
@@ -146,7 +214,10 @@ export default function Lab() {
   );
 
   return (
-    <View style={styles.container}>
+    <ScrollView 
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
+    >
       <View style={styles.header}>
         <Text style={styles.stat}>Lives: {gameState.lives}</Text>
         <Text style={styles.stat}>Score: {gameState.score}</Text>
@@ -154,15 +225,15 @@ export default function Lab() {
       </View>
 
       <View style={styles.mapContainer}>
-            {gameState.map.map((row, y) => (
-                <View key={`row-${y}`} style={styles.row}>
-                {row.map((cell, x) => (
-                    <View key={`cell-${y}-${x}`}>
-                    {renderCell(cell, x, y)}
-                    </View>
-                ))}
+        {gameState.map.map((row, y) => (
+            <View key={`row-${y}`} style={styles.row}>
+            {row.map((cell, x) => (
+                <View key={`cell-${y}-${x}`}>
+                {renderCell(cell, x, y)} 
                 </View>
             ))}
+            </View>
+        ))}
       </View>
 
       <View style={styles.actions}>
@@ -212,19 +283,23 @@ export default function Lab() {
                 key={command}
                 style={[
                     styles.commandButton,
-                    gameState.commands.length >= MAX_COMMANDS && styles.commandButtonDisabled
+                    (gameState.iterations <= 0 || gameState.lives <= 0 || 
+                    gameState.commands.length >= MAX_COMMANDS) && 
+                    styles.commandButtonDisabled
                 ]}
                 onPress={() => addCommand(command)}
-                disabled={gameState.commands.length >= MAX_COMMANDS}
+                disabled={gameState.iterations <= 0 || gameState.lives <= 0 || 
+                            gameState.commands.length >= MAX_COMMANDS}
                 >
                 <Ionicons 
                     name={commandToIcon[command]}
                     size={24} 
-                    color={gameState.commands.length >= MAX_COMMANDS ? '#9CA3AF' : theme.colors.primary} 
+                    color={(gameState.iterations <= 0 || gameState.lives <= 0) ? 
+                        '#9CA3AF' : theme.colors.primary} 
                 />
                 </Pressable>
             ))}
-        </View>
+            </View>
 
         <Text style={styles.subtitle}>Sequence</Text>
         <ScrollView horizontal style={styles.sequence}>
@@ -247,15 +322,18 @@ export default function Lab() {
             ))}
         </ScrollView>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: theme.spacing.lg,
     backgroundColor: '#F3F4F6',
+  },
+  contentContainer: {
+    padding: theme.spacing.lg,
+    paddingBottom: 20, // Space for bottom navigation
   },
   header: {
     flexDirection: 'row',
@@ -297,6 +375,15 @@ const styles = StyleSheet.create({
     borderColor: '#E5E7EB',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  empty: {
+    backgroundColor: '#F3F4F6',
+  },
+  wall: {
+    backgroundColor: theme.colors.primary,
+  },
+  highlightedWall: {
+    backgroundColor: '#EF4444', // Red color for collision
   },
   pellet: {
     width: 8,
