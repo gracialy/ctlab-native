@@ -91,25 +91,26 @@ export default function SignUp() {
         editable={!loading}
       />
 
-      <Button 
-        title={loading ? "Creating account..." : "Sign Up"}
-        onPress={signUpWithEmail}
-        disabled={loading}
-      />
-
-      <Button 
-        title="Already have an account? Sign In"
-        variant="secondary"
-        onPress={() => router.push('/login')}
-        disabled={loading}
-      />
-
-      {loading && (
-        <ActivityIndicator 
-          color={theme.colors.primary} 
-          style={styles.loader}
+      <View style={styles.buttonContainer}>
+        <Button 
+          title={loading ? "Creating account..." : "Sign Up"}
+          onPress={signUpWithEmail}
+          disabled={loading}
         />
-      )}
+
+        <Button 
+          title="Already have an account? Sign In"
+          variant="secondary"
+          onPress={() => router.push('/login')}
+          disabled={loading}
+        />
+        {loading && (
+          <ActivityIndicator 
+            color={theme.colors.primary} 
+            style={styles.loader}
+          />
+        )}
+      </View>
     </View>
   );
 }
@@ -142,5 +143,9 @@ const styles = StyleSheet.create({
   },
   loader: {
     marginTop: theme.spacing.md
-  }
+  },
+  buttonContainer: {
+    gap: theme.spacing.md, // Add spacing between buttons
+    marginTop: theme.spacing.lg, // Add top margin
+  },
 });

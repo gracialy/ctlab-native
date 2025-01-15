@@ -73,25 +73,25 @@ export default function Login() {
         editable={!loading}
       />
 
-      <Button 
-        title={loading ? "Signing in..." : "Sign In"}
-        onPress={signInWithEmail}
-        disabled={loading}
-      />
-
-      <Button 
-        title="Create Account"
-        variant="secondary"
-        onPress={() => router.push('/signup')}
-        disabled={loading}
-      />
-
-      {loading && (
+      <View style={styles.buttonContainer}>
+        <Button 
+          title={loading ? "Signing in..." : "Sign In"}
+          onPress={signInWithEmail}
+          disabled={loading}
+        />
+        <Button 
+          title="Create Account"
+          variant="secondary"
+          onPress={() => router.push('/signup')}
+          disabled={loading}
+        />
+        {loading && (
         <ActivityIndicator 
           color={theme.colors.primary} 
           style={styles.loader}
         />
       )}
+      </View>
     </View>
   );
 }
@@ -124,5 +124,9 @@ const styles = StyleSheet.create({
     },
     loader: {
       marginTop: theme.spacing.md
-    }
+    },
+    buttonContainer: {
+      gap: theme.spacing.md, // Add spacing between buttons
+      marginTop: theme.spacing.lg, // Add top margin
+    },
 });
