@@ -63,26 +63,30 @@ export default function Profile() {
     <ScrollView style={styles.container}>
       <View style={styles.header}>
         <View style={styles.avatarContainer}>
-          <Ionicons name="person-circle" size={80} color={theme.colors.primary} />
+          <View style={styles.avatar}>
+            <Ionicons name="person" size={40} color="white" />
+          </View>
         </View>
         <Text style={styles.email}>{userEmail}</Text>
       </View>
 
-      <View style={styles.section}>
+      <View style={styles.activitySection}>
         <Text style={styles.sectionTitle}>Recent Activity</Text>
         {activities.map((activity, index) => (
           <Pressable
             key={index}
             style={({ pressed }) => [
-              styles.activityItem,
-              pressed && styles.activityItemPressed
+                styles.activityCard,
+                pressed && styles.activityCardPressed
             ]}
             onPress={() => handleActivityPress(activity.module_id, activity.last_page_index)}
           >
-            <Ionicons name="time" size={24} color={theme.colors.primary} />
+            <View style={styles.activityIcon}>
+              <Ionicons name="time" size={24} color={theme.colors.primary} />
+            </View>
             <View style={styles.activityContent}>
               <Text style={styles.activityTitle}>
-                Accessed {activity.module_title || activity.module_id}
+                {activity.module_title || activity.module_id}
               </Text>
               <Text style={styles.activityTime}>
                 {new Date(activity.last_access_time).toLocaleDateString()}
@@ -98,72 +102,126 @@ export default function Profile() {
         ))}
       </View>
 
-      <View style={styles.buttonContainer}>
-        <Button
-          title="Sign Out"
+      <View style={styles.actionSection}>
+        <Pressable 
+          style={styles.signOutButton}
           onPress={handleSignOut}
-          variant="secondary"
-          icon={<Ionicons name="log-out" size={20} color={theme.colors.primary} />}
-        />
+        >
+          <Ionicons name="log-out" size={20} color={theme.colors.error} />
+          <Text style={styles.signOutText}>Sign Out</Text>
+        </Pressable>
       </View>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: theme.colors.background,
-  },
-  header: {
-    alignItems: 'center',
-    padding: theme.spacing.xl,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
-  },
-  avatarContainer: {
-    marginBottom: theme.spacing.md,
-  },
-  email: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: theme.colors.text,
-  },
-  section: {
-    padding: theme.spacing.lg,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: theme.spacing.md,
-    color: theme.colors.text,
-  },
-  activityItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: theme.spacing.md,
-    backgroundColor: theme.colors.surface,
-    borderRadius: 8,
-    marginBottom: theme.spacing.sm,
-  },
-  activityItemPressed: {
-    opacity: 0.7,
-  },
-  activityArrow: {
-    marginLeft: 'auto',
-  },
-  activityContent: {
-    marginLeft: theme.spacing.md,
-  },
-  activityTitle: {
-    fontSize: 16,
-    color: theme.colors.text,
-  },
-  activityTime: {
-    fontSize: 14,
-    color: '#6B7280',
-  },
-  buttonContainer: {
-    padding: theme.spacing.lg,
-  },
+    container: {
+      flex: 1,
+      backgroundColor: '#F3F4F6',
+    },
+    header: {
+      alignItems: 'center',
+      padding: theme.spacing.xl,
+      backgroundColor: 'white',
+      borderBottomWidth: 1,
+      borderBottomColor: '#E5E7EB',
+    },
+    avatarContainer: {
+      marginBottom: theme.spacing.md,
+    },
+    avatar: {
+      width: 80,
+      height: 80,
+      borderRadius: 40,
+      backgroundColor: theme.colors.primary,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    email: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: theme.colors.text,
+    },
+    activitySection: {
+      padding: theme.spacing.lg,
+    },
+    sectionTitle: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      marginBottom: theme.spacing.md,
+      color: theme.colors.text,
+    },
+    activityCard: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      padding: theme.spacing.md,
+      backgroundColor: 'white',
+      borderRadius: 12,
+      marginBottom: theme.spacing.sm,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.1,
+      shadowRadius: 2,
+      elevation: 2,
+    },
+    activityCardPressed: {
+      opacity: 0.7,
+    },
+    activityIcon: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: `${theme.colors.primary}15`,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: theme.spacing.md,
+    },
+    activityContent: {
+      flex: 1,
+      marginLeft: theme.spacing.md,
+    },
+    activityTitle: {
+      fontSize: 16,
+      fontWeight: '500',
+      color: theme.colors.text,
+    },
+    activityTime: {
+      fontSize: 14,
+      color: '#6B7280',
+      marginTop: 2,
+    },
+    activityItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      padding: theme.spacing.md,
+      backgroundColor: theme.colors.surface,
+      borderRadius: 8,
+      marginBottom: theme.spacing.sm,
+    },
+    activityItemPressed: {
+      opacity: 0.7,
+    },
+    activityArrow: {
+      marginLeft: 'auto',
+    },
+    actionSection: {
+      padding: theme.spacing.xl,
+    },
+    signOutButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: theme.spacing.sm,
+      backgroundColor: 'white',
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: theme.colors.error,
+      gap: theme.spacing.sm,
+    },
+    signOutText: {
+      color: theme.colors.error,
+      fontSize: 16,
+      fontWeight: '600',
+    },
 });

@@ -32,7 +32,7 @@ export default function Login() {
         return;
       }
 
-      router.replace('/(tabs)');
+      router.replace('/(tabs)/lab');
     } catch (err) {
       setError('An unexpected error occurred');
       console.error(err);
