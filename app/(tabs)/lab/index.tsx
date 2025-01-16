@@ -29,6 +29,8 @@ export default function Lab() {
   ];
 
   const { width } = useWindowDimensions();
+  const containerWidth = Math.min(width - 32, 768); // Max container width with padding
+  const cellSize = Math.floor(containerWidth / 11); // 11 is map size
   const isMobile = width < 380; // Add breakpoint check
 
   const [gameState, setGameState] = useState<GameState>({
@@ -185,22 +187,183 @@ export default function Lab() {
     'down': 'caret-down'
   };
 
+  const [pacmanColor, setPacmanColor] = useState<string>('yellow');
+
+  const styles = StyleSheet.create({
+    outerContainer: {
+      flex: 1,
+      backgroundColor: '#F3F4F6',
+    },
+    innerContainer: {
+      width: '100%',
+      maxWidth: 768,
+      alignSelf: 'center',
+      flex: 1,
+    },
+    contentContainer: {
+      padding: theme.spacing.lg,
+      paddingBottom: 20, // Space for bottom navigation
+    },
+    header: {
+      flexDirection: 'row',
+      justifyContent: 'space-around',
+      marginBottom: theme.spacing.xl,
+      backgroundColor: 'white',
+      padding: theme.spacing.md,
+      borderRadius: 12,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 3,
+    },
+    stat: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: theme.colors.text,
+    },
+    mapContainer: {
+      alignItems: 'center',
+      marginBottom: theme.spacing.xl,
+      backgroundColor: 'white',
+      padding: theme.spacing.lg,
+      borderRadius: 12,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 3,
+    },
+    row: {
+      flexDirection: 'row',
+    },
+    cell: {
+      width: cellSize,
+      height: cellSize,
+      borderWidth: 1,
+      borderColor: '#E5E7EB',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    empty: {
+      backgroundColor: '#F3F4F6',
+    },
+    wall: {
+      backgroundColor: theme.colors.primary,
+    },
+    highlightedWall: {
+      backgroundColor: '#EF4444', // Red color for collision
+    },
+    pellet: {
+      width: cellSize * 0.25, // Scale pellet with cell
+      height: cellSize * 0.25,
+      borderRadius: cellSize * 0.125,
+      backgroundColor: '#FCD34D',
+    },
+    actions: {
+      flexDirection: 'row',
+      justifyContent: 'space-around',
+      padding: theme.spacing.md,
+      backgroundColor: 'white',
+      borderRadius: 12,
+      marginBottom: theme.spacing.lg,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 3,
+      flexWrap: 'wrap',
+      gap: theme.spacing.sm,
+    },
+    iconButtonSize: {
+      width: 40,
+      height: 40,
+      minWidth: 40,
+      padding: 0,
+    },
+    sequenceContainer: {
+      minHeight: 60, // Ensures space for sequence
+      marginBottom: theme.spacing.lg,
+    },
+    sequence: {
+      maxHeight: 120, // Increase height for mobile
+      flexDirection: 'row',
+      flexWrap: 'wrap', // Allow wrapping
+      gap: theme.spacing.xs,
+    },
+    controls: {
+      backgroundColor: 'white',
+      padding: theme.spacing.lg,
+      borderRadius: 12,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 3,
+      marginBottom: 60, // Add space for bottom navigation
+    },
+    subtitle: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      marginBottom: theme.spacing.md,
+      color: theme.colors.text,
+    },
+    commandButtons: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      gap: theme.spacing.md,
+      marginBottom: theme.spacing.lg,
+    },
+    commandButton: {
+      width: 50,
+      height: 50,
+      backgroundColor: 'white',
+      borderRadius: 25,
+      justifyContent: 'center',
+      alignItems: 'center',
+      borderWidth: 2,
+      borderColor: theme.colors.primary,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.1,
+      shadowRadius: 2,
+      elevation: 2,
+    },
+    commandButtonDisabled: {
+      opacity: 0.5,
+      backgroundColor: '#F3F4F6',
+      borderColor: '#E5E7EB',
+    },
+    command: {
+      width: 40,
+      height: 40,
+      backgroundColor: 'white',
+      borderRadius: 20,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginHorizontal: 4,
+      borderWidth: 1,
+      borderColor: theme.colors.primary,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.1,
+      shadowRadius: 2,
+      elevation: 2,
+    },
+  });
+
   const renderCell = (cell: Cell, x: number, y: number) => {
     let content = null;
     
     switch (cell) {
       case 'pacman':
-        content = <Ionicons name="ellipse" size={20} color="yellow" />;
+        content = <Ionicons name="ellipse" size={cellSize * 0.7} color={pacmanColor} />;
         break;
       case 'ghost':
-        content = <Ionicons name="logo-snapchat" size={20} color="red" />;
+        content = <Ionicons name="logo-snapchat" size={cellSize * 0.7} color="red" />;
         break;
       case 'pellet':
         content = <View style={styles.pellet} />;
-        break;
-      case 'wall':
-      case 'empty':
-        content = null;
         break;
     }
 
@@ -360,171 +523,3 @@ export default function Lab() {
     </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  outerContainer: {
-    flex: 1,
-    backgroundColor: '#F3F4F6',
-  },
-  innerContainer: {
-    width: '100%',
-    maxWidth: 768,
-    alignSelf: 'center',
-    flex: 1,
-  },
-  contentContainer: {
-    padding: theme.spacing.lg,
-    paddingBottom: 20, // Space for bottom navigation
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginBottom: theme.spacing.xl,
-    backgroundColor: 'white',
-    padding: theme.spacing.md,
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  stat: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: theme.colors.text,
-  },
-  mapContainer: {
-    alignItems: 'center',
-    marginBottom: theme.spacing.xl,
-    backgroundColor: 'white',
-    padding: theme.spacing.lg,
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  row: {
-    flexDirection: 'row',
-  },
-  cell: {
-    width: 28,
-    height: 28,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  empty: {
-    backgroundColor: '#F3F4F6',
-  },
-  wall: {
-    backgroundColor: theme.colors.primary,
-  },
-  highlightedWall: {
-    backgroundColor: '#EF4444', // Red color for collision
-  },
-  pellet: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#FCD34D', // Warm yellow
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1,
-    elevation: 1,
-  },
-  actions: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    padding: theme.spacing.md,
-    backgroundColor: 'white',
-    borderRadius: 12,
-    marginBottom: theme.spacing.lg,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-    flexWrap: 'wrap',
-    gap: theme.spacing.sm,
-  },
-  iconButtonSize: {
-    width: 40,
-    height: 40,
-    minWidth: 40,
-    padding: 0,
-  },
-  sequenceContainer: {
-    minHeight: 60, // Ensures space for sequence
-    marginBottom: theme.spacing.lg,
-  },
-  sequence: {
-    maxHeight: 120, // Increase height for mobile
-    flexDirection: 'row',
-    flexWrap: 'wrap', // Allow wrapping
-    gap: theme.spacing.xs,
-  },
-  controls: {
-    backgroundColor: 'white',
-    padding: theme.spacing.lg,
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-    marginBottom: 60, // Add space for bottom navigation
-  },
-  subtitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: theme.spacing.md,
-    color: theme.colors.text,
-  },
-  commandButtons: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: theme.spacing.md,
-    marginBottom: theme.spacing.lg,
-  },
-  commandButton: {
-    width: 50,
-    height: 50,
-    backgroundColor: 'white',
-    borderRadius: 25,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: theme.colors.primary,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  commandButtonDisabled: {
-    opacity: 0.5,
-    backgroundColor: '#F3F4F6',
-    borderColor: '#E5E7EB',
-  },
-  command: {
-    width: 40,
-    height: 40,
-    backgroundColor: 'white',
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginHorizontal: 4,
-    borderWidth: 1,
-    borderColor: theme.colors.primary,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-});
