@@ -77,25 +77,26 @@ export default function Lab() {
 
   const handleRun = async () => {
     if (gameState.iterations <= 0) {
-        alert('No more iterations left!');
-        return;
+      alert('No more iterations left!');
+      return;
     }
-
+  
     if (gameState.lives <= 0) {
-        alert('Game Over - No more lives!');
-        return;
+      alert('Game Over - No more lives!');
+      return;
     }
-
+  
     setIsRunning(true);
     const newMap = [...gameState.map];
     let currentPos = { ...gameState.pacman };
     let currentScore = gameState.score;
     let wallHit = false;
-
+    let ghostHit = false;
+  
     // Execute each command
     for (const command of gameState.commands) {
-      if (wallHit) break;
-
+      if (wallHit || ghostHit) break;
+  
       await new Promise(resolve => setTimeout(resolve, 500)); // Animation delay
       
       let newX = currentPos.x;
@@ -107,47 +108,58 @@ export default function Lab() {
         case 'up': newY--; break;
         case 'down': newY++; break;
       }
-
+  
       // Check if move hits wall
       if (newMap[newY][newX] === 'wall') {
         wallHit = true;
-        currentScore = Math.max(0, currentScore - 5); // Prevent negative score
+        currentScore = Math.max(0, currentScore - 5);
         
-        // Highlight wall
         setWallHighlight({ x: newX, y: newY });
         await new Promise(resolve => setTimeout(resolve, 300));
         setWallHighlight(null);
-
-        // Reset positions after collision
+  
         resetPositions();
-      } 
-      else {
-        // Check if pellet and update score
-        if (newMap[newY][newX] === 'pellet') {
-            currentScore += 10;
-        }
-
-        // Update map
-        newMap[currentPos.y][currentPos.x] = 'empty';
-        newMap[newY][newX] = 'pacman';
-        currentPos = { x: newX, y: newY };
-        
-        setGameState(prev => ({
-          ...prev,
-          map: newMap,
-          pacman: currentPos,
-          score: currentScore
-        }));
+        continue;
       }
+  
+      // Check if move hits ghost
+      if (newMap[newY][newX] === 'ghost') {
+        ghostHit = true;
+        currentScore = Math.max(0, currentScore - 5);
+        
+        setPacmanColor('red');
+        await new Promise(resolve => setTimeout(resolve, 300));
+        setPacmanColor('yellow');
+  
+        resetPositions();
+        continue;
+      }
+  
+      // Valid move
+      if (newMap[newY][newX] === 'pellet') {
+        currentScore += 10;
+      }
+  
+      // Update map
+      newMap[currentPos.y][currentPos.x] = 'empty';
+      newMap[newY][newX] = 'pacman';
+      currentPos = { x: newX, y: newY };
+      
+      setGameState(prev => ({
+        ...prev,
+        map: newMap,
+        pacman: currentPos,
+        score: currentScore
+      }));
     }
-
+  
     // Updates after all commands are executed
     setGameState(prev => ({
-        ...prev,
-        commands: [], // Reset commands array
-        iterations: prev.iterations - 1,
-        score: currentScore,
-        lives: wallHit ? prev.lives - 1 : prev.lives,
+      ...prev,
+      commands: [], // Reset commands array
+      iterations: prev.iterations - 1,
+      score: currentScore,
+      lives: (wallHit || ghostHit) ? prev.lives - 1 : prev.lives,
     }));
     
     setIsRunning(false);
@@ -216,12 +228,14 @@ export default function Lab() {
     'down': 'caret-down'
   };
 
+  const [pacmanColor, setPacmanColor] = useState<string>('yellow');
+
   const renderCell = (cell: Cell, x: number, y: number) => {
     let content = null;
     
     switch (cell) {
       case 'pacman':
-        content = <Ionicons name="ellipse" size={20} color="yellow" />;
+        content = <Ionicons name="ellipse" size={20} color={pacmanColor} />;
         break;
       case 'ghost':
         content = <Ionicons name="logo-snapchat" size={20} color="red" />;
