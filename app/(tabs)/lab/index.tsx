@@ -1,10 +1,14 @@
 import { View, Text, StyleSheet, Pressable, ScrollView, useWindowDimensions } from 'react-native';
 import { theme } from '@/constants/Theme';
-import { useState, useRef, ComponentProps } from 'react';
+import { useState, useRef, ComponentProps, useEffect } from 'react';
 import { Ionicons } from '@expo/vector-icons';
-import { Cell, CellStyleMap, Command, GameState } from '@/types/game';
+import { Cell, CellStyleMap, Command, GameState, SavedGame } from '@/types/game';
 import { Button } from '@/components/Button';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { loadGameState, loadSavedGames, saveGameState } from '@/lib/game';
+import { SaveGameModal } from '@/components/SaveGameModal';
+import { LoadGameModal } from '@/components/LoadGameModal';
+
 
 type WallHighlight = { x: number; y: number } | null;
 type IconName = ComponentProps<typeof Ionicons>['name'];
@@ -120,28 +124,45 @@ export default function Lab() {
     // Reset to initial state if needed
   };
 
-  const handleSave = async () => {
-    try {
-      await AsyncStorage.setItem('gameState', JSON.stringify(gameState));
-      alert('Game saved successfully');
-    } catch (error) {
-      console.error('Error saving game:', error);
-      alert('Failed to save game');
-    }
+  const [saveModalVisible, setSaveModalVisible] = useState(false);
+  const [loadModalVisible, setLoadModalVisible] = useState(false);
+  const [savedGames, setSavedGames] = useState<SavedGame[]>([]);
+
+  const handleSave = async (saveName: string) => {
+    await saveGameState(gameState, saveName);
+    setSaveModalVisible(false);
   };
 
-  const handleLoad = async () => {
-    try {
-      const savedState = await AsyncStorage.getItem('gameState');
-      if (savedState) {
-        setGameState(JSON.parse(savedState));
-        alert('Game loaded successfully');
+  const handleLoad = async (saveId: string) => {
+    if (saveId === 'new') {
+      setGameState({
+        map: initialMap,
+        pacman: { x: 5, y: 5 }, // Center position
+        ghosts: [
+          { x: 1, y: 1 },
+          { x: 9, y: 1 },
+          { x: 1, y: 9 },
+          { x: 9, y: 9 }
+        ],
+        lives: 3,
+        score: 0,
+        iterations: 20,
+        commands: []
+      });
+    } else {
+      const loadedState = await loadGameState(saveId);
+      if (loadedState) {
+        setGameState(loadedState);
       }
-    } catch (error) {
-      console.error('Error loading game:', error);
-      alert('Failed to load game');
     }
+    setLoadModalVisible(false);
   };
+
+  useEffect(() => {
+    if (loadModalVisible) {
+      loadSavedGames().then(setSavedGames);
+    }
+  }, [loadModalVisible]);
 
   const MAX_COMMANDS = 10;
 
@@ -227,51 +248,65 @@ export default function Lab() {
       <View style={styles.mapContainer}>
         {gameState.map.map((row, y) => (
             <View key={`row-${y}`} style={styles.row}>
-            {row.map((cell, x) => (
+              {row.map((cell, x) => (
                 <View key={`cell-${y}-${x}`}>
                 {renderCell(cell, x, y)} 
                 </View>
-            ))}
+              ))}
             </View>
         ))}
       </View>
+
+      <SaveGameModal
+        visible={saveModalVisible}
+        onClose={() => setSaveModalVisible(false)}
+        onSave={handleSave}
+      />
+      
+      <LoadGameModal
+        visible={loadModalVisible}
+        onClose={() => setLoadModalVisible(false)}
+        onLoad={handleLoad}
+        savedGames={savedGames}
+      />
 
       <View style={styles.actions}>
         <Button
             title={isMobile ? "" : (isRunning ? "Abort" : "Run")}
             onPress={isRunning ? handleAbort : handleRun}
+            disabled={isRunning || gameState.commands.length === 0}
             icon={
-            <Ionicons 
+              <Ionicons 
                 name={isRunning ? "stop-circle" : "play"} 
                 size={20} 
                 color="white" 
-            />
+              />
             }
             style={isMobile ? styles.iconButtonSize : undefined}
         />
         <Button
-            title={isMobile ? "" : "Save"}
-            onPress={handleSave}
-            icon={
+          title={isMobile ? "" : "Save"}
+          onPress={() => setSaveModalVisible(true)}
+          icon={
             <Ionicons 
-                name="save-outline" 
-                size={20} 
-                color="white" 
-            />
-            }
-            style={isMobile ? styles.iconButtonSize : undefined}
+            name="save-outline" 
+            size={20} 
+            color="white" 
+          />
+        }
+          style={isMobile ? styles.iconButtonSize : undefined}
         />
         <Button
-            title={isMobile ? "" : "Load"}
-            onPress={handleLoad}
-            icon={
+          title={isMobile ? "" : "Load"}
+          onPress={() => setLoadModalVisible(true)}
+          icon={
             <Ionicons 
-                name="folder-open-outline" 
-                size={20} 
-                color="white" 
-            />
-            }
-            style={isMobile ? styles.iconButtonSize : undefined}
+            name="folder-open-outline" 
+            size={20} 
+            color="white" 
+          />
+        }
+          style={isMobile ? styles.iconButtonSize : undefined}
         />
         </View>
 
@@ -279,7 +314,7 @@ export default function Lab() {
         <Text style={styles.subtitle}>Commands</Text>
         <View style={styles.commandButtons}>
             {(['left', 'right', 'up', 'down'] as Command[]).map((command) => (
-                <Pressable
+              <Pressable
                 key={command}
                 style={[
                     styles.commandButton,
@@ -290,14 +325,14 @@ export default function Lab() {
                 onPress={() => addCommand(command)}
                 disabled={gameState.iterations <= 0 || gameState.lives <= 0 || 
                             gameState.commands.length >= MAX_COMMANDS}
-                >
+              >
                 <Ionicons 
                     name={commandToIcon[command]}
                     size={24} 
                     color={(gameState.iterations <= 0 || gameState.lives <= 0) ? 
                         '#9CA3AF' : theme.colors.primary} 
                 />
-                </Pressable>
+              </Pressable>
             ))}
             </View>
 

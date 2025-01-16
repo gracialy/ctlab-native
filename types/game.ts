@@ -17,3 +17,10 @@ export type CellStyle = {
 };
 
 export type CellStyleMap = Record<Cell, CellStyle>;
+
+export type SavedGame = {
+    id: string;
+    save_name: string;
+    saved_at: string;
+};
+  
