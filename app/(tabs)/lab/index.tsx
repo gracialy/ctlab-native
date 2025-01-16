@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, Pressable, ScrollView, useWindowDimensions } fr
 import { theme } from '@/constants/Theme';
 import { useState, useRef, ComponentProps, useEffect } from 'react';
 import { Ionicons } from '@expo/vector-icons';
-import { Cell, CellStyleMap, Command, GameState, SavedGame } from '@/types/game';
+import { Cell, CellStyleMap, Command, GameState, Position, SavedGame } from '@/types/game';
 import { Button } from '@/components/Button';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { loadGameState, loadSavedGames, saveGameState } from '@/lib/game';
@@ -27,17 +27,48 @@ export default function Lab() {
     ['wall', 'pellet', 'pellet', 'pellet', 'pellet', 'pellet', 'pellet', 'pellet', 'pellet', 'ghost',  'wall'],
     ['wall', 'wall',   'wall',   'wall',   'wall',   'wall',   'wall',   'wall',   'wall',   'wall',   'wall'],
   ];
+  const initialPacman: Position = { x: 5, y: 5 }; // Center
+  const initialGhost: Position[] = [
+    { x: 1, y: 1 },
+    { x: 9, y: 9 }
+  ];
+  const initialLives = 3;
+  const initialScore = 0;
+  const initialIterations = 20;
+
+  const resetPositions = () => {
+    const newMap = [...gameState.map];
+    
+    // Clear current positions
+    newMap[gameState.pacman.y][gameState.pacman.x] = 'empty';
+    gameState.ghosts.forEach(ghost => {
+      newMap[ghost.y][ghost.x] = 'empty';
+    });
+    
+    // Set new positions
+    newMap[initialPacman.y][initialPacman.x] = 'pacman';
+    initialGhost.forEach(pos => {
+      newMap[pos.y][pos.x] = 'ghost';
+    });
+    
+    setGameState(prev => ({
+      ...prev,
+      map: newMap,
+      pacman: initialPacman,
+      ghosts: [...initialGhost]
+    }));
+  };
 
   const { width } = useWindowDimensions();
   const isMobile = width < 380; // Add breakpoint check
 
   const [gameState, setGameState] = useState<GameState>({
     map: initialMap,
-    pacman: { x: 5, y: 5 }, // Starting position from the map
-    ghosts: [{ x: 1, y: 1 }, { x: 10, y: 10 }], // Ghost position from the map
-    lives: 3,
-    score: 0,
-    iterations: 20,
+    pacman: initialPacman, // Starting position from the map
+    ghosts: initialGhost, // Ghost position from the map
+    lives: initialLives,
+    score: initialScore,
+    iterations: initialIterations,
     commands: []
   });
 
@@ -86,6 +117,9 @@ export default function Lab() {
         setWallHighlight({ x: newX, y: newY });
         await new Promise(resolve => setTimeout(resolve, 300));
         setWallHighlight(null);
+
+        // Reset positions after collision
+        resetPositions();
       } 
       else {
         // Check if pellet and update score
@@ -137,16 +171,11 @@ export default function Lab() {
     if (saveId === 'new') {
       setGameState({
         map: initialMap,
-        pacman: { x: 5, y: 5 }, // Center position
-        ghosts: [
-          { x: 1, y: 1 },
-          { x: 9, y: 1 },
-          { x: 1, y: 9 },
-          { x: 9, y: 9 }
-        ],
-        lives: 3,
-        score: 0,
-        iterations: 20,
+        pacman: initialPacman, 
+        ghosts: initialGhost,
+        lives: initialLives,
+        score: initialScore,
+        iterations: initialIterations,
         commands: []
       });
     } else {
