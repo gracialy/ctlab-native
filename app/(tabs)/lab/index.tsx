@@ -16,15 +16,15 @@ type IconName = ComponentProps<typeof Ionicons>['name'];
 export default function Lab() {  
   const initialMap: Cell[][] = [
     ['wall', 'wall',   'wall',   'wall',   'wall',   'wall',   'wall',   'wall',   'wall',   'wall',   'wall'],
-    ['wall', 'ghost',  'pellet', 'pellet', 'pellet', 'pellet', 'pellet', 'pellet', 'pellet', 'pellet', 'wall'],
+    ['wall', 'pellet',  'pellet', 'pellet', 'pellet', 'wall', 'pellet', 'pellet', 'pellet', 'pellet', 'wall'],
     ['wall', 'pellet', 'wall',   'wall',   'pellet', 'wall',   'pellet', 'wall',   'wall',   'pellet', 'wall'],
     ['wall', 'pellet', 'wall',   'pellet', 'pellet', 'pellet', 'pellet', 'pellet', 'wall',   'pellet', 'wall'],
     ['wall', 'pellet', 'pellet', 'pellet', 'wall',   'pellet',  'wall',   'pellet', 'pellet', 'pellet', 'wall'],
-    ['wall', 'pellet', 'wall',   'pellet', 'pellet', 'pacman', 'pellet',  'pellet', 'wall',   'pellet', 'wall'],
+    ['wall', 'wall',   'wall',   'pellet', 'wall',   'pacman',   'wall',  'pellet', 'wall',   'wall', 'wall'],
     ['wall', 'pellet', 'pellet', 'pellet', 'wall',   'pellet',  'wall',   'pellet', 'pellet', 'pellet', 'wall'],
     ['wall', 'pellet', 'wall',   'pellet', 'pellet', 'pellet', 'pellet', 'pellet', 'wall',   'pellet', 'wall'],
     ['wall', 'pellet', 'wall',   'wall',   'pellet', 'wall',   'pellet', 'wall',   'wall',   'pellet', 'wall'],
-    ['wall', 'pellet', 'pellet', 'pellet', 'pellet', 'pellet', 'pellet', 'pellet', 'pellet', 'ghost',  'wall'],
+    ['wall', 'pellet', 'pellet', 'pellet', 'pellet', 'wall', 'pellet', 'pellet', 'pellet', 'pellet',  'wall'],
     ['wall', 'wall',   'wall',   'wall',   'wall',   'wall',   'wall',   'wall',   'wall',   'wall',   'wall'],
   ];
   const initialPacman: Position = { x: 5, y: 5 }; // Center
