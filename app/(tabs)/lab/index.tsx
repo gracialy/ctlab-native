@@ -234,135 +234,143 @@ export default function Lab() {
 
   return (
     <ScrollView 
-      style={styles.container}
+      style={styles.outerContainer}
       contentContainerStyle={styles.contentContainer}
     >
+      <View style={styles.innerContainer}>
       <View style={styles.header}>
-        <Text style={styles.stat}>Lives: {gameState.lives}</Text>
-        <Text style={styles.stat}>Score: {gameState.score}</Text>
-        <Text style={styles.stat}>Iterations: {gameState.iterations}</Text>
-      </View>
-
-      <View style={styles.mapContainer}>
-        {gameState.map.map((row, y) => (
-            <View key={`row-${y}`} style={styles.row}>
-              {row.map((cell, x) => (
-                <View key={`cell-${y}-${x}`}>
-                {renderCell(cell, x, y)} 
-                </View>
-              ))}
-            </View>
-        ))}
-      </View>
-
-      <SaveGameModal
-        visible={saveModalVisible}
-        onClose={() => setSaveModalVisible(false)}
-        onSave={handleSave}
-      />
-      
-      <LoadGameModal
-        visible={loadModalVisible}
-        onClose={() => setLoadModalVisible(false)}
-        onLoad={handleLoad}
-        savedGames={savedGames}
-      />
-
-      <View style={styles.actions}>
-        <Button
-            title={isMobile ? "" : (isRunning ? "Abort" : "Run")}
-            onPress={isRunning ? handleAbort : handleRun}
-            disabled={isRunning || gameState.commands.length === 0}
-            icon={
-              <Ionicons 
-                name={isRunning ? "stop-circle" : "play"} 
-                size={20} 
-                color="white" 
-              />
-            }
-            style={isMobile ? styles.iconButtonSize : undefined}
-        />
-        <Button
-          title={isMobile ? "" : "Save"}
-          onPress={() => setSaveModalVisible(true)}
-          icon={
-            <Ionicons 
-            name="save-outline" 
-            size={20} 
-            color="white" 
-          />
-        }
-          style={isMobile ? styles.iconButtonSize : undefined}
-        />
-        <Button
-          title={isMobile ? "" : "Load"}
-          onPress={() => setLoadModalVisible(true)}
-          icon={
-            <Ionicons 
-            name="folder-open-outline" 
-            size={20} 
-            color="white" 
-          />
-        }
-          style={isMobile ? styles.iconButtonSize : undefined}
-        />
+          <Text style={styles.stat}>Lives: {gameState.lives}</Text>
+          <Text style={styles.stat}>Score: {gameState.score}</Text>
+          <Text style={styles.stat}>Iterations: {gameState.iterations}</Text>
         </View>
 
-      <View style={styles.controls}>
-        <Text style={styles.subtitle}>Commands</Text>
-        <View style={styles.commandButtons}>
-            {(['left', 'right', 'up', 'down'] as Command[]).map((command) => (
-              <Pressable
-                key={command}
-                style={[
-                    styles.commandButton,
-                    (gameState.iterations <= 0 || gameState.lives <= 0 || 
-                    gameState.commands.length >= MAX_COMMANDS) && 
-                    styles.commandButtonDisabled
-                ]}
-                onPress={() => addCommand(command)}
-                disabled={gameState.iterations <= 0 || gameState.lives <= 0 || 
-                            gameState.commands.length >= MAX_COMMANDS}
-              >
-                <Ionicons 
-                    name={commandToIcon[command]}
-                    size={24} 
-                    color={(gameState.iterations <= 0 || gameState.lives <= 0) ? 
-                        '#9CA3AF' : theme.colors.primary} 
-                />
-              </Pressable>
-            ))}
-            </View>
+        <View style={styles.mapContainer}>
+          {gameState.map.map((row, y) => (
+              <View key={`row-${y}`} style={styles.row}>
+                {row.map((cell, x) => (
+                  <View key={`cell-${y}-${x}`}>
+                  {renderCell(cell, x, y)} 
+                  </View>
+                ))}
+              </View>
+          ))}
+        </View>
 
-        <Text style={styles.subtitle}>Sequence</Text>
-        <ScrollView horizontal style={styles.sequence}>
-            {gameState.commands.map((command, index) => (
-            <Pressable
-                key={index}
-                style={styles.command}
-                onPress={() => {
-                const newCommands = [...gameState.commands];
-                newCommands.splice(index, 1);
-                setGameState({ ...gameState, commands: newCommands });
-                }}
-            >
+        <SaveGameModal
+          visible={saveModalVisible}
+          onClose={() => setSaveModalVisible(false)}
+          onSave={handleSave}
+        />
+        
+        <LoadGameModal
+          visible={loadModalVisible}
+          onClose={() => setLoadModalVisible(false)}
+          onLoad={handleLoad}
+          savedGames={savedGames}
+        />
+
+        <View style={styles.actions}>
+          <Button
+              title={isMobile ? "" : (isRunning ? "Abort" : "Run")}
+              onPress={isRunning ? handleAbort : handleRun}
+              disabled={isRunning || gameState.commands.length === 0}
+              icon={
                 <Ionicons 
-                name={commandToIcon[command]}
-                size={24} 
-                color={theme.colors.primary} 
+                  name={isRunning ? "stop-circle" : "play"} 
+                  size={20} 
+                  color="white" 
                 />
-            </Pressable>
-            ))}
-        </ScrollView>
+              }
+              style={isMobile ? styles.iconButtonSize : undefined}
+          />
+          <Button
+            title={isMobile ? "" : "Save"}
+            onPress={() => setSaveModalVisible(true)}
+            icon={
+              <Ionicons 
+              name="save-outline" 
+              size={20} 
+              color="white" 
+            />
+          }
+            style={isMobile ? styles.iconButtonSize : undefined}
+          />
+          <Button
+            title={isMobile ? "" : "Load"}
+            onPress={() => setLoadModalVisible(true)}
+            icon={
+              <Ionicons 
+              name="folder-open-outline" 
+              size={20} 
+              color="white" 
+            />
+          }
+            style={isMobile ? styles.iconButtonSize : undefined}
+          />
+          </View>
+
+        <View style={styles.controls}>
+          <Text style={styles.subtitle}>Commands</Text>
+          <View style={styles.commandButtons}>
+              {(['left', 'right', 'up', 'down'] as Command[]).map((command) => (
+                <Pressable
+                  key={command}
+                  style={[
+                      styles.commandButton,
+                      (gameState.iterations <= 0 || gameState.lives <= 0 || 
+                      gameState.commands.length >= MAX_COMMANDS) && 
+                      styles.commandButtonDisabled
+                  ]}
+                  onPress={() => addCommand(command)}
+                  disabled={gameState.iterations <= 0 || gameState.lives <= 0 || 
+                              gameState.commands.length >= MAX_COMMANDS}
+                >
+                  <Ionicons 
+                      name={commandToIcon[command]}
+                      size={24} 
+                      color={(gameState.iterations <= 0 || gameState.lives <= 0) ? 
+                          '#9CA3AF' : theme.colors.primary} 
+                  />
+                </Pressable>
+              ))}
+              </View>
+
+          <Text style={styles.subtitle}>Sequence</Text>
+          <ScrollView horizontal style={styles.sequence}>
+              {gameState.commands.map((command, index) => (
+              <Pressable
+                  key={index}
+                  style={styles.command}
+                  onPress={() => {
+                  const newCommands = [...gameState.commands];
+                  newCommands.splice(index, 1);
+                  setGameState({ ...gameState, commands: newCommands });
+                  }}
+              >
+                  <Ionicons 
+                  name={commandToIcon[command]}
+                  size={24} 
+                  color={theme.colors.primary} 
+                  />
+              </Pressable>
+              ))}
+          </ScrollView>
+        </View>
       </View>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  outerContainer: {
     flex: 1,
     backgroundColor: '#F3F4F6',
+  },
+  innerContainer: {
+    width: '100%',
+    maxWidth: 768,
+    alignSelf: 'center',
+    flex: 1,
   },
   contentContainer: {
     padding: theme.spacing.lg,

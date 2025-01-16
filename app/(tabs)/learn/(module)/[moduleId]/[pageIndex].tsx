@@ -61,87 +61,95 @@ export default function ModulePage() {
   const hasPrevPage = currentPageIndex > 0;
 
   return (
-    <View style={styles.container}>
+    <View style={styles.outerContainer}>
+      <View style={styles.innerContainer}>
       <ScrollView 
-        style={styles.content}
-        contentContainerStyle={styles.contentContainer} // Add this
-      >
-        <View style={styles.progressCard}>
-          <Text style={styles.moduleTitle}>{module.title}</Text>
-          <View style={styles.progressBar}>
-            <View 
-              style={[
-                styles.progressFill, 
-                { width: `${progressPercentage}%` }
-              ]} 
-            />
+          style={styles.content}
+          contentContainerStyle={styles.contentContainer} // Add this
+        >
+          <View style={styles.progressCard}>
+            <Text style={styles.moduleTitle}>{module.title}</Text>
+            <View style={styles.progressBar}>
+              <View 
+                style={[
+                  styles.progressFill, 
+                  { width: `${progressPercentage}%` }
+                ]} 
+              />
+            </View>
+            <Text style={styles.progressText}>
+              Lesson {currentPageIndex + 1} of {module.pages.length}
+            </Text>
           </View>
-          <Text style={styles.progressText}>
-            Lesson {currentPageIndex + 1} of {module.pages.length}
-          </Text>
-        </View>
 
-        <View style={styles.contentCard}>
-          <Text style={styles.pageTitle}>{currentPage.title}</Text>
-          
-          {Array.isArray(currentPage.content) ? (
-            currentPage.content.map((section: ContentSection, index: number) => (
-              <View key={index} style={styles.section}>
-                {section.type === 'paragraph' && (
-                  <FormattedText content={section.content as string} />
-                )}
-                {section.type === 'list' && (
-                  <View style={styles.list}>
-                    {(section.content as string[]).map((item: string, i: number) => (
-                      <View key={i} style={styles.listItem}>
-                        <Text style={styles.bullet}>•</Text>
-                        <FormattedText content={item} />
-                      </View>
-                    ))}
-                  </View>
-                )}
-              </View>
-            ))
+          <View style={styles.contentCard}>
+            <Text style={styles.pageTitle}>{currentPage.title}</Text>
+            
+            {Array.isArray(currentPage.content) ? (
+              currentPage.content.map((section: ContentSection, index: number) => (
+                <View key={index} style={styles.section}>
+                  {section.type === 'paragraph' && (
+                    <FormattedText content={section.content as string} />
+                  )}
+                  {section.type === 'list' && (
+                    <View style={styles.list}>
+                      {(section.content as string[]).map((item: string, i: number) => (
+                        <View key={i} style={styles.listItem}>
+                          <Text style={styles.bullet}>•</Text>
+                          <FormattedText content={item} />
+                        </View>
+                      ))}
+                    </View>
+                  )}
+                </View>
+              ))
+            ) : (
+              <FormattedText content={currentPage.content as string} />
+            )}
+          </View>
+        </ScrollView>
+
+        <View style={styles.navigationContainer}>
+          {hasPrevPage && (
+            <Button 
+              title="Previous"
+              variant="secondary"
+              onPress={() => router.push(`/learn/(module)/${moduleId}/${currentPageIndex - 1}`)}
+              icon={<Ionicons name="arrow-back" size={20} color={theme.colors.primary} />}
+            />
+          )}
+          <View style={styles.spacer} />
+          {isLastPage ? (
+            <Button 
+              title="Complete"
+              onPress={handleComplete}
+              icon={<Ionicons name="checkmark" size={20} color="white" />}
+              iconPosition="right"
+            />
           ) : (
-            <FormattedText content={currentPage.content as string} />
+            <Button 
+              title="Next"
+              onPress={() => router.push(`/learn/(module)/${moduleId}/${currentPageIndex + 1}`)}
+              icon={<Ionicons name="arrow-forward" size={20} color="white" />}
+              iconPosition="right"
+            />
           )}
         </View>
-      </ScrollView>
-
-      <View style={styles.navigationContainer}>
-        {hasPrevPage && (
-          <Button 
-            title="Previous"
-            variant="secondary"
-            onPress={() => router.push(`/learn/(module)/${moduleId}/${currentPageIndex - 1}`)}
-            icon={<Ionicons name="arrow-back" size={20} color={theme.colors.primary} />}
-          />
-        )}
-        <View style={styles.spacer} />
-        {isLastPage ? (
-          <Button 
-            title="Complete"
-            onPress={handleComplete}
-            icon={<Ionicons name="checkmark" size={20} color="white" />}
-            iconPosition="right"
-          />
-        ) : (
-          <Button 
-            title="Next"
-            onPress={() => router.push(`/learn/(module)/${moduleId}/${currentPageIndex + 1}`)}
-            icon={<Ionicons name="arrow-forward" size={20} color="white" />}
-            iconPosition="right"
-          />
-        )}
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  outerContainer: {
     flex: 1,
     backgroundColor: '#F3F4F6',
+  },
+  innerContainer: {
+    width: '100%',
+    maxWidth: 768,
+    alignSelf: 'center',
+    flex: 1,
   },
   content: {
     flex: 1,

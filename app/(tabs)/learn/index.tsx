@@ -23,72 +23,80 @@ export default function LearnIndex() {
   }, []);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Modules</Text>
-      <FlatList
-        data={modules}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.list}
-        renderItem={({ item }) => (
-          <Pressable 
-            style={({ pressed }) => [
-              styles.moduleCard,
-              pressed && styles.moduleCardPressed
-            ]}
-            onPress={async () => {
-              const progress = await getModuleProgress(item.id);
-              const lastPage = progress?.last_page_index || 0;
-              router.push(`/learn/(module)/${item.id}/${lastPage}`);
-            }}
-          >
-            <View style={styles.cardHeader}>
-              <View style={styles.iconContainer}>
-                <Ionicons name="book-outline" size={24} color={theme.colors.primary} />
-              </View>
-              <View style={styles.progressContainer}>
-                <Text style={styles.progressText}>
-                  {progressMap[item.id]?.completed_at 
-                    ? `${item.pages.length}/${item.pages.length} completed` 
-                    : `${(progressMap[item.id]?.last_page_index || 0) + 1}/${item.pages.length} completed`
-                  }
-                </Text>
-
-                <View style={styles.progressBar}>
-                  <View style={[
-                    styles.progressFill,
-                    { 
-                      width: progressMap[item.id]?.completed_at 
-                        ? '100%'
-                        : `${(((progressMap[item.id]?.last_page_index || 0) + 1) / item.pages.length) * 100}%`
+    <View style={styles.outerContainer}>
+      <View style={styles.innerContainer}>
+        <Text style={styles.title}>Modules</Text>
+        <FlatList
+          data={modules}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.list}
+          renderItem={({ item }) => (
+            <Pressable 
+              style={({ pressed }) => [
+                styles.moduleCard,
+                pressed && styles.moduleCardPressed
+              ]}
+              onPress={async () => {
+                const progress = await getModuleProgress(item.id);
+                const lastPage = progress?.last_page_index || 0;
+                router.push(`/learn/(module)/${item.id}/${lastPage}`);
+              }}
+            >
+              <View style={styles.cardHeader}>
+                <View style={styles.iconContainer}>
+                  <Ionicons name="book-outline" size={24} color={theme.colors.primary} />
+                </View>
+                <View style={styles.progressContainer}>
+                  <Text style={styles.progressText}>
+                    {progressMap[item.id]?.completed_at 
+                      ? `${item.pages.length}/${item.pages.length} completed` 
+                      : `${(progressMap[item.id]?.last_page_index || 0) + 1}/${item.pages.length} completed`
                     }
-                  ]} />
+                  </Text>
+
+                  <View style={styles.progressBar}>
+                    <View style={[
+                      styles.progressFill,
+                      { 
+                        width: progressMap[item.id]?.completed_at 
+                          ? '100%'
+                          : `${(((progressMap[item.id]?.last_page_index || 0) + 1) / item.pages.length) * 100}%`
+                      }
+                    ]} />
+                  </View>
                 </View>
               </View>
-            </View>
-            <Text style={styles.moduleTitle}>{item.title}</Text>
-            <Text style={styles.moduleDescription}>{item.description}</Text>
-            <View style={styles.cardFooter}>
-              <Text style={styles.lessonCount}>
-                {item.pages.length} lessons
-              </Text>
-              <Ionicons 
-                name="arrow-forward" 
-                size={20} 
-                color={theme.colors.primary} 
-              />
-            </View>
-          </Pressable>
-        )}
-      />
+              <Text style={styles.moduleTitle}>{item.title}</Text>
+              <Text style={styles.moduleDescription}>{item.description}</Text>
+              <View style={styles.cardFooter}>
+                <Text style={styles.lessonCount}>
+                  {item.pages.length} lessons
+                </Text>
+                <Ionicons 
+                  name="arrow-forward" 
+                  size={20} 
+                  color={theme.colors.primary} 
+                />
+              </View>
+            </Pressable>
+          )}
+        />
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  outerContainer: {
     flex: 1,
-    backgroundColor: theme.colors.background,
-    paddingTop: 60,
+    backgroundColor: '#F3F4F6',
+  },
+  innerContainer: {
+    width: '100%',
+    maxWidth: 768,
+    alignSelf: 'center',
+    flex: 1,
+    marginTop: theme.spacing.xl,
   },
   list: {
     padding: theme.spacing.lg,

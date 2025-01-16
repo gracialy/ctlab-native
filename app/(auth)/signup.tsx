@@ -49,78 +49,86 @@ export default function SignUp() {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={styles.outerContainer}>
+      <View style={styles.innerContainer}>
       <View style={styles.header}>
-        <Text style={styles.title}>Create Account</Text>
-        <Text style={styles.subtitle}>Sign up to get started</Text>
-      </View>
+          <Text style={styles.title}>Create Account</Text>
+          <Text style={styles.subtitle}>Sign up to get started</Text>
+        </View>
 
-      {error ? <Text style={styles.error}>{error}</Text> : null}
+        {error ? <Text style={styles.error}>{error}</Text> : null}
 
-      <Input
-        placeholder="Email"
-        value={email}
-        onChangeText={(text) => {
-          setEmail(text);
-          setError('');
-        }}
-        autoCapitalize="none"
-        keyboardType="email-address"
-        editable={!loading}
-      />
-
-      <Input
-        placeholder="Password"
-        value={password}
-        onChangeText={(text) => {
-          setPassword(text);
-          setError('');
-        }}
-        secureTextEntry
-        editable={!loading}
-      />
-
-      <Input
-        placeholder="Confirm Password"
-        value={confirmPassword}
-        onChangeText={(text) => {
-          setConfirmPassword(text);
-          setError('');
-        }}
-        secureTextEntry
-        editable={!loading}
-      />
-
-      <View style={styles.buttonContainer}>
-        <Button 
-          title={loading ? "Creating account..." : "Sign Up"}
-          onPress={signUpWithEmail}
-          disabled={loading}
+        <Input
+          placeholder="Email"
+          value={email}
+          onChangeText={(text) => {
+            setEmail(text);
+            setError('');
+          }}
+          autoCapitalize="none"
+          keyboardType="email-address"
+          editable={!loading}
         />
 
-        <Button 
-          title="Already have an account? Sign In"
-          variant="secondary"
-          onPress={() => router.push('/login')}
-          disabled={loading}
+        <Input
+          placeholder="Password"
+          value={password}
+          onChangeText={(text) => {
+            setPassword(text);
+            setError('');
+          }}
+          secureTextEntry
+          editable={!loading}
         />
-        {loading && (
-          <ActivityIndicator 
-            color={theme.colors.primary} 
-            style={styles.loader}
+
+        <Input
+          placeholder="Confirm Password"
+          value={confirmPassword}
+          onChangeText={(text) => {
+            setConfirmPassword(text);
+            setError('');
+          }}
+          secureTextEntry
+          editable={!loading}
+        />
+
+        <View style={styles.buttonContainer}>
+          <Button 
+            title={loading ? "Creating account..." : "Sign Up"}
+            onPress={signUpWithEmail}
+            disabled={loading}
           />
-        )}
+
+          <Button 
+            title="Already have an account? Sign In"
+            variant="secondary"
+            onPress={() => router.push('/login')}
+            disabled={loading}
+          />
+          {loading && (
+            <ActivityIndicator 
+              color={theme.colors.primary} 
+              style={styles.loader}
+            />
+          )}
+        </View>
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  outerContainer: {
     flex: 1,
-    padding: theme.spacing.xl,
     backgroundColor: theme.colors.background,
-    justifyContent: 'center'
+    justifyContent: 'center',
+    padding: theme.spacing.xl,
+  },
+  innerContainer: {
+    width: '100%',
+    maxWidth: 768,
+    alignSelf: 'center',
+    flex: 1,
   },
   header: {
     marginBottom: theme.spacing.xl,
