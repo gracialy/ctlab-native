@@ -1,5 +1,4 @@
-import { View, Text, StyleSheet, ScrollView, Pressable, Dimensions } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, Text, StyleSheet, ScrollView, Pressable, Dimensions, Image } from 'react-native';
 import { theme } from '@/constants/Theme';
 import { supabase } from '@/lib/supabase';
 import { router } from 'expo-router';
@@ -47,19 +46,19 @@ export default function Profile() {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         setUserEmail(user.email || '');
-        
+
         // Fetch learn activities
         const { data: learnActivities } = await supabase
           .from('module_progress')
           .select('module_id, last_access_time')
           .order('last_access_time', { ascending: false });
-  
+
         // Fetch lab activities
         const { data: labActivities } = await supabase
           .from('game_states')
           .select('id, save_name, score, saved_at')
           .order('saved_at', { ascending: false });
-  
+
         // Combine and format activities
         const allActivities: Activity[] = [
           ...(learnActivities?.map(a => ({
@@ -69,15 +68,15 @@ export default function Profile() {
           })) || []),
           ...(labActivities?.map(a => ({
             type: 'lab' as const,
-            id: a.id, 
+            id: a.id,
             save_name: a.save_name,
             score: a.score,
             last_access_time: a.saved_at,
           })) || []),
-        ].sort((a, b) => 
+        ].sort((a, b) =>
           new Date(b.last_access_time).getTime() - new Date(a.last_access_time).getTime()
         ).slice(0, 5);
-  
+
         setActivities(allActivities);
       }
     }
@@ -91,10 +90,10 @@ export default function Profile() {
         .select('score, saved_at, id')
         .order('saved_at', { ascending: false })
         .limit(5);
-  
+
       if (data) setLabHistory(data);
     }
-  
+
     fetchLabHistory();
   }, []);
 
@@ -104,7 +103,14 @@ export default function Profile() {
         <View style={styles.header}>
           <View style={styles.avatarContainer}>
             <View style={styles.avatar}>
-              <Ionicons name="person" size={40} color="white" />
+              <Image
+                source={require('@/assets/images/profile.svg')}
+                style={{
+                  width: 33,
+                  height: 40,
+                  tintColor: 'white'
+                }}
+              />
             </View>
           </View>
           <Text style={styles.email}>{userEmail}</Text>
@@ -123,20 +129,34 @@ export default function Profile() {
                 if (activity.type === 'learn' && activity.module_id) {
                   router.push(`/learn/(module)/${activity.module_id}/0`);
                 } else if (activity.type === 'lab' && activity.id) { // Change save_name to id
-                    router.push('/lab');
+                  router.push('/lab');
                 }
               }}
             >
               <View style={styles.activityIcon}>
-                <Ionicons 
-                  name={activity.type === 'learn' ? "book" : "game-controller"} 
-                  size={24} 
-                  color={theme.colors.primary} 
-                />
+                {activity.type === 'learn' ? (
+                  <Image
+                    source={require('@/assets/images/learn.svg')}
+                    style={{
+                      width: 24,
+                      height: 24,
+                      tintColor: theme.colors.primary
+                    }}
+                  />
+                ) : (
+                  <Image
+                    source={require('@/assets/images/lab.svg')}
+                    style={{
+                      width: 24,
+                      height: 24,
+                      tintColor: theme.colors.primary
+                    }}
+                  />
+                )}
               </View>
               <View style={styles.activityContent}>
                 <Text style={styles.activityTitle}>
-                  {activity.type === 'learn' 
+                  {activity.type === 'learn'
                     ? `Accessed ${modules.find(m => m.id === activity.module_id)?.title || activity.module_id}`
                     : `Played Lab - ${activity.save_name} (Score: ${activity.score})`
                   }
@@ -146,7 +166,14 @@ export default function Profile() {
                 </Text>
               </View>
               {activity.type === 'learn' && (
-                <Ionicons name="chevron-forward" size={20} color="#6B7280" />
+                <Image
+                  source={require('@/assets/images/arrow-right.svg')}
+                  style={{
+                    width: 20,
+                    height: 20,
+                    tintColor: '#6B7280'
+                  }}
+                />
               )}
             </Pressable>
           ))}
@@ -155,11 +182,11 @@ export default function Profile() {
         <View style={styles.graphSection}>
           <View style={styles.graphHeader}>
             <Text style={styles.sectionTitle}>Lab Performance</Text>
-            <Text style={styles.graphSubtitle}>Up to last 10 games</Text>
+            {/* <Text style={styles.graphSubtitle}>Recent games</Text> */}
           </View>
-          
-          <ScrollView 
-            horizontal 
+
+          <ScrollView
+            horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.chartScrollContent}
           >
@@ -170,15 +197,15 @@ export default function Profile() {
                   <View key={index} style={styles.barContainer}>
                     <Text style={styles.scoreLabel}>{history.score}</Text>
                     <View style={[
-                      styles.bar, 
+                      styles.bar,
                       { height: Math.max(normalizedHeight, 20) }
                     ]}>
                       <View style={styles.barGradient} />
                     </View>
                     <Text style={styles.barLabel}>
-                      {new Date(history.saved_at).toLocaleDateString(undefined, { 
-                        month: 'short', 
-                        day: 'numeric' 
+                      {new Date(history.saved_at).toLocaleDateString(undefined, {
+                        month: 'short',
+                        day: 'numeric'
                       })}
                     </Text>
                   </View>
@@ -186,7 +213,7 @@ export default function Profile() {
               })}
             </View>
           </ScrollView>
-          
+
           <View style={styles.statsRow}>
             <View style={styles.statItem}>
               <Text style={styles.statLabel}>Average Score</Text>
@@ -204,11 +231,15 @@ export default function Profile() {
         </View>
 
         <View style={styles.actionSection}>
-          <Pressable 
-            style={styles.signOutButton}
-            onPress={handleSignOut}
-          >
-            <Ionicons name="log-out" size={20} color={theme.colors.error} />
+          <Pressable style={styles.signOutButton} onPress={handleSignOut}>
+            <Image
+              source={require('@/assets/images/log-out.svg')}
+              style={{
+                width: 20,
+                height: 20,
+                tintColor: theme.colors.error
+              }}
+            />
             <Text style={styles.signOutText}>Sign Out</Text>
           </Pressable>
         </View>

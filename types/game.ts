@@ -1,5 +1,5 @@
 export type Cell = 'wall' | 'empty' | 'pellet' | 'ghost' | 'pacman';
-export type Command = 'left' | 'right' | 'up' | 'down';
+export type Command = 'left' | 'right' | 'up' | 'down' | 'special' | 'special2';
 export type Position = { x: number; y: number };
 
 export type GameState = {

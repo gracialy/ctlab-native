@@ -1,8 +1,7 @@
-import { Modal, View, Text, FlatList, Pressable, StyleSheet } from 'react-native';
+import { Modal, View, Text, FlatList, Pressable, StyleSheet, Image } from 'react-native';
 import { theme } from '@/constants/Theme';
 import { Button } from '@/components/Button';
 import { SavedGame } from '@/types/game';
-import { Ionicons } from '@expo/vector-icons';
 
 type LoadGameModalProps = {
   visible: boolean;
@@ -22,7 +21,14 @@ export function LoadGameModal({ visible, onClose, onLoad, savedGames }: LoadGame
               style={styles.newGameButton}
               onPress={() => onLoad('new')}
             >
-              <Ionicons name="add-circle-outline" size={24} color={theme.colors.primary} />
+              <Image 
+                source={require('@/assets/images/add.svg')}
+                style={{
+                  width: 28,
+                  height: 28,
+                  tintColor: theme.colors.primary
+                }}
+              />
               <Text style={styles.newGameText}>New Game</Text>
             </Pressable>
             

@@ -1,0 +1,14 @@
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = false
+	logallrefupdates = true
+[remote "ctlab-android"]
+	url = https://github.com/gracialy/ctlab-android.git
+	fetch = +refs/heads/*:refs/remotes/ctlab-android/*
+[branch "main"]
+	remote = ctlab-android
+	merge = refs/heads/main
+[remote "origin"]
+	url = https://github.com/gracialy/ctlab-native
+	fetch = +refs/heads/*:refs/remotes/origin/*

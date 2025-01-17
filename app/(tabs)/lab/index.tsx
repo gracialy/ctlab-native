@@ -1,7 +1,6 @@
-import { View, Text, StyleSheet, Pressable, ScrollView, useWindowDimensions } from 'react-native';
+import { View, Text, StyleSheet, Pressable, ScrollView, useWindowDimensions, Image } from 'react-native';
 import { theme } from '@/constants/Theme';
 import { useState, useRef, ComponentProps, useEffect } from 'react';
-import { Ionicons } from '@expo/vector-icons';
 import { Cell, CellStyleMap, Command, GameState, SavedGame } from '@/types/game';
 import { Button } from '@/components/Button';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -11,26 +10,25 @@ import { LoadGameModal } from '@/components/LoadGameModal';
 
 
 type WallHighlight = { x: number; y: number } | null;
-type IconName = ComponentProps<typeof Ionicons>['name'];
 
-export default function Lab() {  
+export default function Lab() {
   const initialMap: Cell[][] = [
-    ['wall', 'wall',   'wall',   'wall',   'wall',   'wall',   'wall',   'wall',   'wall',   'wall',   'wall'],
-    ['wall', 'pellet',  'pellet', 'pellet', 'pellet', 'wall', 'pellet', 'pellet', 'pellet', 'pellet', 'wall'],
-    ['wall', 'pellet', 'wall',   'wall',   'pellet', 'wall',   'pellet', 'wall',   'wall',   'pellet', 'wall'],
-    ['wall', 'pellet', 'wall',   'pellet', 'pellet', 'pellet', 'pellet', 'pellet', 'wall',   'pellet', 'wall'],
-    ['wall', 'pellet', 'pellet', 'pellet', 'wall',   'pellet',  'wall',   'pellet', 'pellet', 'pellet', 'wall'],
-    ['wall', 'wall', 'wall',   'pellet', 'pellet', 'pacman', 'pellet',  'pellet', 'wall',   'wall', 'wall'],
-    ['wall', 'pellet', 'pellet', 'pellet', 'wall',   'pellet',  'wall',   'pellet', 'pellet', 'pellet', 'wall'],
-    ['wall', 'pellet', 'wall',   'pellet', 'pellet', 'pellet', 'pellet', 'pellet', 'wall',   'pellet', 'wall'],
-    ['wall', 'pellet', 'wall',   'wall',   'pellet', 'wall',   'pellet', 'wall',   'wall',   'pellet', 'wall'],
-    ['wall', 'pellet', 'pellet', 'pellet', 'pellet', 'wall', 'pellet', 'pellet', 'pellet', 'pellet',  'wall'],
-    ['wall', 'wall',   'wall',   'wall',   'wall',   'wall',   'wall',   'wall',   'wall',   'wall',   'wall'],
+    ['wall', 'wall', 'wall', 'wall', 'wall', 'wall', 'wall', 'wall', 'wall', 'wall', 'wall'],
+    ['wall', 'pellet', 'pellet', 'pellet', 'pellet', 'wall', 'pellet', 'pellet', 'pellet', 'pellet', 'wall'],
+    ['wall', 'pellet', 'wall', 'wall', 'pellet', 'wall', 'pellet', 'wall', 'wall', 'pellet', 'wall'],
+    ['wall', 'pellet', 'wall', 'pellet', 'pellet', 'pellet', 'pellet', 'pellet', 'wall', 'pellet', 'wall'],
+    ['wall', 'pellet', 'pellet', 'pellet', 'wall', 'pellet', 'wall', 'pellet', 'pellet', 'pellet', 'wall'],
+    ['wall', 'wall', 'wall', 'pellet', 'wall', 'pacman', 'wall', 'pellet', 'wall', 'wall', 'wall'],
+    ['wall', 'pellet', 'pellet', 'pellet', 'wall', 'pellet', 'wall', 'pellet', 'pellet', 'pellet', 'wall'],
+    ['wall', 'pellet', 'wall', 'pellet', 'pellet', 'pellet', 'pellet', 'pellet', 'wall', 'pellet', 'wall'],
+    ['wall', 'pellet', 'wall', 'wall', 'pellet', 'wall', 'pellet', 'wall', 'wall', 'pellet', 'wall'],
+    ['wall', 'pellet', 'pellet', 'pellet', 'pellet', 'wall', 'pellet', 'pellet', 'pellet', 'pellet', 'wall'],
+    ['wall', 'wall', 'wall', 'wall', 'wall', 'wall', 'wall', 'wall', 'wall', 'wall', 'wall'],
   ];
 
   const { width } = useWindowDimensions();
   const containerWidth = Math.min(width - 32, 768); // Max container width with padding
-  const cellSize = Math.floor(containerWidth / 11); // 11 is map size
+  const cellSize = Math.floor(containerWidth / 15); // 11 is map size
   const isMobile = width < 380; // Add breakpoint check
 
   const [gameState, setGameState] = useState<GameState>({
@@ -46,32 +44,93 @@ export default function Lab() {
   const [isRunning, setIsRunning] = useState(false);
   const [wallHighlight, setWallHighlight] = useState<WallHighlight>(null);
 
+  // Update run button disable condition
+  const isRunDisabled =
+    isRunning ||
+    gameState.commands.length === 0 ||
+    // Special command must be followed by a direction
+    (gameState.commands.some((cmd, index) =>
+      (cmd === 'special' || cmd === 'special2') && (
+        index === gameState.commands.length - 1 ||
+        !['left', 'right', 'up', 'down'].includes(gameState.commands[index + 1])
+      )
+    ));
+
   const handleRun = async () => {
     if (gameState.iterations <= 0) {
-        alert('No more iterations left!');
-        return;
+      alert('No more iterations left!');
+      return;
     }
 
     if (gameState.lives <= 0) {
-        alert('Game Over - No more lives!');
-        return;
+      alert('Game Over - No more lives!');
+      return;
     }
 
     setIsRunning(true);
-    const newMap = [...gameState.map];
+    const newMap = [...gameState.map.map(row => [...row])];
     let currentPos = { ...gameState.pacman };
     let currentScore = gameState.score;
     let wallHit = false;
 
-    // Execute each command
-    for (const command of gameState.commands) {
+    for (let i = 0; i < gameState.commands.length; i++) {
       if (wallHit) break;
 
-      await new Promise(resolve => setTimeout(resolve, 500)); // Animation delay
-      
+      const command = gameState.commands[i];
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Handle special commands
+      if (command === 'special' || command === 'special2') {
+        if (i === gameState.commands.length - 1) continue;
+
+        const nextCommand = gameState.commands[i + 1];
+        let canMove = true;
+
+        while (canMove) {
+          let nextX = currentPos.x;
+          let nextY = currentPos.y;
+
+          switch (nextCommand) {
+            case 'left': nextX--; break;
+            case 'right': nextX++; break;
+            case 'up': nextY--; break;
+            case 'down': nextY++; break;
+          }
+
+          // Stop conditions
+          if (newMap[nextY][nextX] === 'wall' ||
+            (command === 'special2' && isCrossroad(newMap, nextX, nextY))) {
+            canMove = false;
+            continue;
+          }
+
+          // Move pacman
+          if (newMap[nextY][nextX] === 'pellet') {
+            currentScore += 10;
+          }
+
+          newMap[currentPos.y][currentPos.x] = 'empty';
+          newMap[nextY][nextX] = 'pacman';
+          currentPos = { x: nextX, y: nextY };
+
+          await new Promise(resolve => setTimeout(resolve, 100));
+
+          setGameState(prev => ({
+            ...prev,
+            map: newMap,
+            pacman: currentPos,
+            score: currentScore
+          }));
+        }
+
+        i++; // Skip next command as it was used with special
+        continue;
+      }
+
+      // Handle regular movement
       let newX = currentPos.x;
       let newY = currentPos.y;
-  
+
       switch (command) {
         case 'left': newX--; break;
         case 'right': newX++; break;
@@ -79,45 +138,52 @@ export default function Lab() {
         case 'down': newY++; break;
       }
 
-      // Check if move hits wall
+      // Check wall collision
       if (newMap[newY][newX] === 'wall') {
         wallHit = true;
-        currentScore = Math.max(0, currentScore - 5); // Prevent negative score
-        
-        // Highlight wall
+        currentScore = Math.max(0, currentScore - 5);
+
         setWallHighlight({ x: newX, y: newY });
         await new Promise(resolve => setTimeout(resolve, 300));
         setWallHighlight(null);
-      } 
-      else {
-        // Check if pellet and update score
-        if (newMap[newY][newX] === 'pellet') {
-            currentScore += 10;
-        }
+        setPacmanColor('red');
+        await new Promise(resolve => setTimeout(resolve, 300));
+        setPacmanColor('yellow');
 
-        // Update map
+        // Reset position
         newMap[currentPos.y][currentPos.x] = 'empty';
-        newMap[newY][newX] = 'pacman';
-        currentPos = { x: newX, y: newY };
-        
-        setGameState(prev => ({
-          ...prev,
-          map: newMap,
-          pacman: currentPos,
-          score: currentScore
-        }));
+        currentPos = { x: 5, y: 5 };
+        newMap[5][5] = 'pacman';
+
+        continue;
       }
+
+      // Valid move
+      if (newMap[newY][newX] === 'pellet') {
+        currentScore += 10;
+      }
+
+      newMap[currentPos.y][currentPos.x] = 'empty';
+      newMap[newY][newX] = 'pacman';
+      currentPos = { x: newX, y: newY };
+
+      setGameState(prev => ({
+        ...prev,
+        map: newMap,
+        pacman: currentPos,
+        score: currentScore
+      }));
     }
 
-    // Updates after all commands are executed
+    // Final updates
     setGameState(prev => ({
-        ...prev,
-        commands: [], // Reset commands array
-        iterations: prev.iterations - 1,
-        score: currentScore,
-        lives: wallHit ? prev.lives - 1 : prev.lives,
+      ...prev,
+      commands: [],
+      iterations: prev.iterations - 1,
+      score: currentScore,
+      lives: wallHit ? prev.lives - 1 : prev.lives,
     }));
-    
+
     setIsRunning(false);
   };
 
@@ -180,11 +246,32 @@ export default function Lab() {
   };
 
   // Define a mapping for command to icon names
-  const commandToIcon: Record<Command, IconName> = {
-    'left': 'caret-back',
-    'right': 'caret-forward',
-    'up': 'caret-up',
-    'down': 'caret-down'
+  const commandImages = {
+    'left': require('@/assets/images/caret-left.svg'),
+    'right': require('@/assets/images/caret-right.svg'),
+    'up': require('@/assets/images/caret-up.svg'),
+    'down': require('@/assets/images/caret-down.svg'),
+    'special': require('@/assets/images/highway.svg'),
+    'special2': require('@/assets/images/crossroads.svg')
+  } as const;
+
+  const isCrossroad = (map: Cell[][], x: number, y: number) => {
+    const possibleMoves = [
+      { dx: 0, dy: -1 }, // up
+      { dx: 0, dy: 1 },  // down
+      { dx: -1, dy: 0 }, // left
+      { dx: 1, dy: 0 }   // right
+    ];
+
+    console.log(map)
+
+    // Count number of possible moves (non-wall cells)
+    const availablePaths = possibleMoves.filter(move =>
+      map[y + move.dy][x + move.dx] !== 'wall'
+    ).length;
+
+    // It's a crossroad if there are more than 2 possible paths
+    return availablePaths > 2;
   };
 
   const [pacmanColor, setPacmanColor] = useState<string>('yellow');
@@ -308,11 +395,16 @@ export default function Lab() {
       marginBottom: theme.spacing.md,
       color: theme.colors.text,
     },
+    commandButtonsContainer: {
+      maxHeight: 70,
+    },
+    commandButtonsContent: {
+      paddingHorizontal: theme.spacing.md,
+    },
     commandButtons: {
       flexDirection: 'row',
-      justifyContent: 'center',
       gap: theme.spacing.md,
-      marginBottom: theme.spacing.lg,
+      paddingVertical: theme.spacing.sm,
     },
     commandButton: {
       width: 50,
@@ -328,6 +420,9 @@ export default function Lab() {
       shadowOpacity: 0.1,
       shadowRadius: 2,
       elevation: 2,
+    },
+    specialCommandButton: {
+      backgroundColor: `${theme.colors.primary}10`,
     },
     commandButtonDisabled: {
       opacity: 0.5,
@@ -354,54 +449,72 @@ export default function Lab() {
 
   const renderCell = (cell: Cell, x: number, y: number) => {
     let content = null;
-    
+
     switch (cell) {
       case 'pacman':
-        content = <Ionicons name="ellipse" size={cellSize * 0.7} color={pacmanColor} />;
+        content = (
+          <Image
+            source={require('@/assets/images/pacman.svg')}
+            style={{
+              width: cellSize * 0.7,
+              height: cellSize * 0.7,
+              tintColor: pacmanColor
+            }}
+          />
+        );
         break;
-      case 'ghost':
-        content = <Ionicons name="logo-snapchat" size={cellSize * 0.7} color="red" />;
-        break;
+      // case 'ghost':
+      //   content = (
+      //     <Image 
+      //       source={require('@/assets/images/ghost.svg')}
+      //       style={{
+      //         width: cellSize * 0.7,
+      //         height: cellSize * 0.7,
+      //         tintColor: 'red'
+      //       }}
+      //     />
+      //   );
+      //   break;
       case 'pellet':
         content = <View style={styles.pellet} />;
         break;
     }
 
     const isHighlighted = wallHighlight?.x === x && wallHighlight?.y === y;
-  
+
     return (
-        <View style={[
-            styles.cell, 
-            cell === 'wall' && (isHighlighted ? styles.highlightedWall : styles.wall),
-            cell === 'empty' && styles.empty
-        ]}>
-            {content}
-        </View>
+      <View style={[
+        styles.cell,
+        cell === 'wall' && (isHighlighted ? styles.highlightedWall : styles.wall),
+        cell === 'empty' && styles.empty
+      ]}>
+        {content}
+      </View>
     );
   };
-  
+
   // Update where command icons are rendered
-  const renderCommand = (command: Command, index: number) => (
-    <Pressable
-      key={index}
-      style={styles.command}
-      onPress={() => removeCommand(index)}
-    >
-      <Ionicons 
-        name={commandToIcon[command]}
-        size={24} 
-        color={theme.colors.primary} 
-      />
-    </Pressable>
-  );
+  // const renderCommand = (command: Command, index: number) => (
+  //   <Pressable
+  //     key={index}
+  //     style={styles.command}
+  //     onPress={() => removeCommand(index)}
+  //   >
+  //     <Ionicons
+  //       name={commandToIcon[command]}
+  //       size={24}
+  //       color={theme.colors.primary}
+  //     />
+  //   </Pressable>
+  // );
 
   return (
-    <ScrollView 
+    <ScrollView
       style={styles.outerContainer}
       contentContainerStyle={styles.contentContainer}
     >
       <View style={styles.innerContainer}>
-      <View style={styles.header}>
+        <View style={styles.header}>
           <Text style={styles.stat}>Lives: {gameState.lives}</Text>
           <Text style={styles.stat}>Score: {gameState.score}</Text>
           <Text style={styles.stat}>Iterations: {gameState.iterations}</Text>
@@ -409,13 +522,13 @@ export default function Lab() {
 
         <View style={styles.mapContainer}>
           {gameState.map.map((row, y) => (
-              <View key={`row-${y}`} style={styles.row}>
-                {row.map((cell, x) => (
-                  <View key={`cell-${y}-${x}`}>
-                  {renderCell(cell, x, y)} 
-                  </View>
-                ))}
-              </View>
+            <View key={`row-${y}`} style={styles.row}>
+              {row.map((cell, x) => (
+                <View key={`cell-${y}-${x}`}>
+                  {renderCell(cell, x, y)}
+                </View>
+              ))}
+            </View>
           ))}
         </View>
 
@@ -424,7 +537,7 @@ export default function Lab() {
           onClose={() => setSaveModalVisible(false)}
           onSave={handleSave}
         />
-        
+
         <LoadGameModal
           visible={loadModalVisible}
           onClose={() => setLoadModalVisible(false)}
@@ -434,89 +547,145 @@ export default function Lab() {
 
         <View style={styles.actions}>
           <Button
-              title={isMobile ? "" : (isRunning ? "Abort" : "Run")}
-              onPress={isRunning ? handleAbort : handleRun}
-              disabled={isRunning || gameState.commands.length === 0}
-              icon={
-                <Ionicons 
-                  name={isRunning ? "stop-circle" : "play"} 
-                  size={20} 
-                  color="white" 
-                />
-              }
-              style={isMobile ? styles.iconButtonSize : undefined}
-          />
-          <Button
             title={isMobile ? "" : "Save"}
             onPress={() => setSaveModalVisible(true)}
             icon={
-              <Ionicons 
-              name="save-outline" 
-              size={20} 
-              color="white" 
-            />
-          }
+              <Image
+                source={require('@/assets/images/save.svg')}
+                style={{
+                  width: 20,
+                  height: 20,
+                  tintColor: 'white',
+                  marginRight: theme.spacing.sm
+                }}
+              />
+            }
             style={isMobile ? styles.iconButtonSize : undefined}
           />
+
+          <Button
+            title={isMobile ? "" : (isRunning ? "Abort" : "Run")}
+            onPress={isRunning ? handleAbort : handleRun}
+            disabled={isRunDisabled}
+            icon={
+              <Image
+                source={isRunning ? require('@/assets/images/stop.svg') : require('@/assets/images/play.svg')}
+                style={{
+                  width: 20,
+                  height: 20,
+                  tintColor: 'white',
+                  marginRight: theme.spacing.sm
+                }}
+              />
+            }
+            style={isMobile ? styles.iconButtonSize : undefined}
+          />
+
           <Button
             title={isMobile ? "" : "Load"}
             onPress={() => setLoadModalVisible(true)}
             icon={
-              <Ionicons 
-              name="folder-open-outline" 
-              size={20} 
-              color="white" 
-            />
-          }
+              <Image
+                source={require('@/assets/images/folder.svg')}
+                style={{
+                  width: 20,
+                  height: 20,
+                  tintColor: 'white',
+                  marginRight: theme.spacing.sm
+                }}
+              />
+            }
             style={isMobile ? styles.iconButtonSize : undefined}
           />
-          </View>
+        </View>
 
         <View style={styles.controls}>
           <Text style={styles.subtitle}>Commands</Text>
-          <View style={styles.commandButtons}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.commandButtonsContainer}
+            contentContainerStyle={styles.commandButtonsContent}
+          >
+            <View style={styles.commandButtons}>
+              {/* Regular direction commands */}
               {(['left', 'right', 'up', 'down'] as Command[]).map((command) => (
                 <Pressable
                   key={command}
                   style={[
-                      styles.commandButton,
-                      (gameState.iterations <= 0 || gameState.lives <= 0 || 
-                      gameState.commands.length >= MAX_COMMANDS) && 
-                      styles.commandButtonDisabled
+                    styles.commandButton,
+                    (gameState.iterations <= 0 || gameState.lives <= 0 ||
+                      gameState.commands.length >= MAX_COMMANDS) &&
+                    styles.commandButtonDisabled
                   ]}
                   onPress={() => addCommand(command)}
-                  disabled={gameState.iterations <= 0 || gameState.lives <= 0 || 
-                              gameState.commands.length >= MAX_COMMANDS}
+                  disabled={gameState.iterations <= 0 || gameState.lives <= 0 ||
+                    gameState.commands.length >= MAX_COMMANDS}
                 >
-                  <Ionicons 
-                      name={commandToIcon[command]}
-                      size={24} 
-                      color={(gameState.iterations <= 0 || gameState.lives <= 0) ? 
-                          '#9CA3AF' : theme.colors.primary} 
+                  <Image
+                    source={commandImages[command]}
+                    style={{
+                      width: 20,
+                      height: 20,
+                      tintColor: (gameState.iterations <= 0 || gameState.lives <= 0) ?
+                        '#9CA3AF' : theme.colors.primary
+                    }}
                   />
                 </Pressable>
               ))}
-              </View>
+
+              {/* Special command button */}
+              {(['special', 'special2'] as Command[]).map((command) => (
+                <Pressable
+                  key={command}
+                  style={[
+                    styles.commandButton,
+                    styles.specialCommandButton,
+                    (gameState.iterations <= 0 || gameState.lives <= 0 ||
+                      gameState.commands.length >= MAX_COMMANDS) &&
+                    styles.commandButtonDisabled
+                  ]}
+                  onPress={() => addCommand(command)}
+                  disabled={gameState.iterations <= 0 || gameState.lives <= 0 ||
+                    gameState.commands.length >= MAX_COMMANDS}
+                >
+                  <Image
+                    source={commandImages[command]}
+                    style={{
+                      width: 20,
+                      height: 20,
+                      tintColor: (gameState.iterations <= 0 || gameState.lives <= 0) ?
+                        '#9CA3AF' : theme.colors.primary
+                    }}
+                  />
+                </Pressable>
+              ))}
+            </View>
+          </ScrollView>
 
           <Text style={styles.subtitle}>Sequence</Text>
           <ScrollView horizontal style={styles.sequence}>
-              {gameState.commands.map((command, index) => (
+            {gameState.commands.map((command, index) => (
               <Pressable
-                  key={index}
-                  style={styles.command}
-                  onPress={() => {
+                key={index}
+                style={styles.command}
+                onPress={() => {
                   const newCommands = [...gameState.commands];
                   newCommands.splice(index, 1);
                   setGameState({ ...gameState, commands: newCommands });
-                  }}
+                }}
               >
-                  <Ionicons 
-                  name={commandToIcon[command]}
-                  size={24} 
-                  color={theme.colors.primary} 
-                  />
+                <Image
+                  source={commandImages[command]}
+                  style={{
+                    width: 20,
+                    height: 20,
+                    tintColor: (gameState.iterations <= 0 || gameState.lives <= 0) ?
+                      '#9CA3AF' : theme.colors.primary
+                  }}
+                />
               </Pressable>
-              ))}
+            ))}
           </ScrollView>
         </View>
       </View>

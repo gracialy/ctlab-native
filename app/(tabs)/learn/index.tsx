@@ -1,8 +1,7 @@
-import { View, Text, FlatList, Pressable, StyleSheet, Animated } from 'react-native';
+import { View, Text, FlatList, Pressable, StyleSheet, Animated, Image } from 'react-native';
 import { router } from 'expo-router';
 import { modules } from '@/data/modules';
 import { theme } from '@/constants/Theme';
-import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
 import { getModuleProgress } from '@/lib/progress';
 import type { ModuleProgress } from '@/types/progress';
@@ -31,7 +30,7 @@ export default function LearnIndex() {
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.list}
           renderItem={({ item }) => (
-            <Pressable 
+            <Pressable
               style={({ pressed }) => [
                 styles.moduleCard,
                 pressed && styles.moduleCardPressed
@@ -44,12 +43,19 @@ export default function LearnIndex() {
             >
               <View style={styles.cardHeader}>
                 <View style={styles.iconContainer}>
-                  <Ionicons name="book-outline" size={24} color={theme.colors.primary} />
+                  <Image
+                    source={require('@/assets/images/learn.svg')}
+                    style={{
+                      width: 24,
+                      height: 24,
+                      tintColor: theme.colors.primary
+                    }}
+                  />
                 </View>
                 <View style={styles.progressContainer}>
                   <Text style={styles.progressText}>
-                    {progressMap[item.id]?.completed_at 
-                      ? `${item.pages.length}/${item.pages.length} completed` 
+                    {progressMap[item.id]?.completed_at
+                      ? `${item.pages.length}/${item.pages.length} completed`
                       : `${(progressMap[item.id]?.last_page_index || 0) + 1}/${item.pages.length} completed`
                     }
                   </Text>
@@ -57,8 +63,8 @@ export default function LearnIndex() {
                   <View style={styles.progressBar}>
                     <View style={[
                       styles.progressFill,
-                      { 
-                        width: progressMap[item.id]?.completed_at 
+                      {
+                        width: progressMap[item.id]?.completed_at
                           ? '100%'
                           : `${(((progressMap[item.id]?.last_page_index || 0) + 1) / item.pages.length) * 100}%`
                       }
@@ -72,10 +78,13 @@ export default function LearnIndex() {
                 <Text style={styles.lessonCount}>
                   {item.pages.length} lessons
                 </Text>
-                <Ionicons 
-                  name="arrow-forward" 
-                  size={20} 
-                  color={theme.colors.primary} 
+                <Image
+                  source={require('@/assets/images/arrow-right.svg')}
+                  style={{
+                    width: 20,
+                    height: 20,
+                    tintColor: theme.colors.primary
+                  }}
                 />
               </View>
             </Pressable>

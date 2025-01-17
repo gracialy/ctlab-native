@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "uas",
-    "slug": "uas",
+    "name": "ctlab-app",
+    "slug": "ctlab-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -9,15 +9,14 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.gracialy.uas"
+      "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.gracialy.uas"
+      "package": "com.gracialy.ctlabapp"
     },
     "web": {
       "bundler": "metro",
@@ -44,9 +43,8 @@
         "origin": false
       },
       "eas": {
-        "projectId": "8e0b54f0-b70c-4a83-a0d2-f205961aea56"
+        "projectId": "7a55647b-2ec4-41ee-bd26-40fdfef04dba"
       }
-    },
-    "owner": "gracialy"
+    }
   }
 }

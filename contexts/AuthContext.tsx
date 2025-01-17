@@ -11,7 +11,7 @@ const AuthContext = createContext<{
 }>({
   session: null,
   isLoading: true,
-  signOut: async () => {},
+  signOut: async () => { },
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -23,7 +23,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const initializeAuth = async () => {
       try {
         const { data: { session: currentSession }, error } = await supabase.auth.getSession();
-        
+
         if (error) {
           console.error('Error getting session:', error.message);
           return;
@@ -43,7 +43,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, newSession) => {
-        console.log(`[${Platform.OS}] Auth event:`, event);
+        // console.log(`[${Platform.OS}] Auth event:`, event);
         // console.log(`[${Platform.OS}] New session:`, newSession);
         setSession(newSession);
       }

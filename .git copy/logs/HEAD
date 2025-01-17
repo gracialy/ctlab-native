@@ -1,0 +1,33 @@
+0000000000000000000000000000000000000000 b62cfac4e99c17616a68fe295fe6dd5ee0929140 gracialy <ly.gracies@gmail.com> 1736933870 +0700	commit (initial): Initial commit
+b62cfac4e99c17616a68fe295fe6dd5ee0929140 16962ae607c72b86971499e6fdd17603f3e92b7d gracialy <ly.gracies@gmail.com> 1736966132 +0700	commit: feat: learn
+16962ae607c72b86971499e6fdd17603f3e92b7d 7b528211c12eb6e8b21bec991667a2647a4de694 gracialy <ly.gracies@gmail.com> 1736968830 +0700	commit: refactor: disable auth header
+7b528211c12eb6e8b21bec991667a2647a4de694 d8a9c369d67038947e20c6281d47edb58b2882c8 gracialy <ly.gracies@gmail.com> 1736970976 +0700	commit: feat: profile
+d8a9c369d67038947e20c6281d47edb58b2882c8 dd2748fd28174b7e39ddd8696f6b2d6c6df6b90c gracialy <ly.gracies@gmail.com> 1736978473 +0700	commit: feat: lab ui
+dd2748fd28174b7e39ddd8696f6b2d6c6df6b90c 890d190c9e54bc1b750b89a5108d666ae0dc689a gracialy <ly.gracies@gmail.com> 1736983218 +0700	commit: fix: basic command run and game state
+890d190c9e54bc1b750b89a5108d666ae0dc689a 833d7d98a68d214b30980ec934126c06b8006cf9 gracialy <ly.gracies@gmail.com> 1736985757 +0700	commit: refactor: profile ui and navigation
+833d7d98a68d214b30980ec934126c06b8006cf9 6acf8c2f153ba2d1cbec00fce28649e445c688b2 gracialy <ly.gracies@gmail.com> 1737009816 +0700	commit: feat: save and load
+6acf8c2f153ba2d1cbec00fce28649e445c688b2 6acf8c2f153ba2d1cbec00fce28649e445c688b2 gracialy <ly.gracies@gmail.com> 1737010253 +0700	reset: moving to HEAD
+6acf8c2f153ba2d1cbec00fce28649e445c688b2 6acf8c2f153ba2d1cbec00fce28649e445c688b2 gracialy <ly.gracies@gmail.com> 1737017452 +0700	reset: moving to HEAD
+6acf8c2f153ba2d1cbec00fce28649e445c688b2 95630248cf5d8e7b3de7915d77d23f2d4df33c4f gracialy <ly.gracies@gmail.com> 1737018419 +0700	commit: refactor: reset actor on collission
+95630248cf5d8e7b3de7915d77d23f2d4df33c4f 95630248cf5d8e7b3de7915d77d23f2d4df33c4f gracialy <ly.gracies@gmail.com> 1737038872 +0700	reset: moving to HEAD
+95630248cf5d8e7b3de7915d77d23f2d4df33c4f 2e1a9e01cd1a3149dbaa41a7a3b80458191ca3ec gracialy <ly.gracies@gmail.com> 1737040053 +0700	commit: fix: ghost collision
+2e1a9e01cd1a3149dbaa41a7a3b80458191ca3ec 2e1a9e01cd1a3149dbaa41a7a3b80458191ca3ec gracialy <ly.gracies@gmail.com> 1737041178 +0700	reset: moving to HEAD
+2e1a9e01cd1a3149dbaa41a7a3b80458191ca3ec 2e1a9e01cd1a3149dbaa41a7a3b80458191ca3ec gracialy <ly.gracies@gmail.com> 1737044637 +0700	reset: moving to HEAD
+2e1a9e01cd1a3149dbaa41a7a3b80458191ca3ec 95630248cf5d8e7b3de7915d77d23f2d4df33c4f gracialy <ly.gracies@gmail.com> 1737044936 +0700	reset: moving to 9563024
+95630248cf5d8e7b3de7915d77d23f2d4df33c4f 95630248cf5d8e7b3de7915d77d23f2d4df33c4f gracialy <ly.gracies@gmail.com> 1737044966 +0700	reset: moving to 9563024
+95630248cf5d8e7b3de7915d77d23f2d4df33c4f 95630248cf5d8e7b3de7915d77d23f2d4df33c4f gracialy <ly.gracies@gmail.com> 1737044977 +0700	reset: moving to 9563024
+95630248cf5d8e7b3de7915d77d23f2d4df33c4f 2e1a9e01cd1a3149dbaa41a7a3b80458191ca3ec gracialy <ly.gracies@gmail.com> 1737045064 +0700	pull: Fast-forward
+2e1a9e01cd1a3149dbaa41a7a3b80458191ca3ec 95630248cf5d8e7b3de7915d77d23f2d4df33c4f gracialy <ly.gracies@gmail.com> 1737045292 +0700	reset: moving to 9563024
+95630248cf5d8e7b3de7915d77d23f2d4df33c4f d8a9c369d67038947e20c6281d47edb58b2882c8 gracialy <ly.gracies@gmail.com> 1737045332 +0700	reset: moving to d8a9c36
+d8a9c369d67038947e20c6281d47edb58b2882c8 6acf8c2f153ba2d1cbec00fce28649e445c688b2 gracialy <ly.gracies@gmail.com> 1737045379 +0700	reset: moving to 6acf8c2
+6acf8c2f153ba2d1cbec00fce28649e445c688b2 51641b02fde5b4d96fd1a45048a2a2ef6d9cefbf gracialy <ly.gracies@gmail.com> 1737045617 +0700	commit: refactor: disable ghost and reload
+51641b02fde5b4d96fd1a45048a2a2ef6d9cefbf 2e1a9e01cd1a3149dbaa41a7a3b80458191ca3ec gracialy <ly.gracies@gmail.com> 1737045876 +0700	pull --rebase (start): checkout 2e1a9e01cd1a3149dbaa41a7a3b80458191ca3ec
+2e1a9e01cd1a3149dbaa41a7a3b80458191ca3ec b739b8830904277826ea7b0192b7e48497bb2cdd gracialy <ly.gracies@gmail.com> 1737045954 +0700	rebase (continue): refactor: disable ghost and reload
+b739b8830904277826ea7b0192b7e48497bb2cdd b739b8830904277826ea7b0192b7e48497bb2cdd gracialy <ly.gracies@gmail.com> 1737045954 +0700	rebase (finish): returning to refs/heads/main
+b739b8830904277826ea7b0192b7e48497bb2cdd 6acf8c2f153ba2d1cbec00fce28649e445c688b2 gracialy <ly.gracies@gmail.com> 1737046637 +0700	reset: moving to 6acf8c2
+6acf8c2f153ba2d1cbec00fce28649e445c688b2 6acf8c2f153ba2d1cbec00fce28649e445c688b2 gracialy <ly.gracies@gmail.com> 1737046665 +0700	reset: moving to 6acf8c2
+6acf8c2f153ba2d1cbec00fce28649e445c688b2 b739b8830904277826ea7b0192b7e48497bb2cdd gracialy <ly.gracies@gmail.com> 1737046888 +0700	reset: moving to b739b88
+b739b8830904277826ea7b0192b7e48497bb2cdd 16e8b2bcf15da4a64e3f7ca1a4ae00300578e436 gracialy <ly.gracies@gmail.com> 1737046974 +0700	commit: refactor: disable ghost and reload collision
+16e8b2bcf15da4a64e3f7ca1a4ae00300578e436 c8528c80eabc6003ab5e8db1aa843dd6fc403c69 gracialy <ly.gracies@gmail.com> 1737052743 +0700	commit: refactor: ui
+c8528c80eabc6003ab5e8db1aa843dd6fc403c69 8497cd55effc6d11770e38f20b0a73215e7a7dc8 gracialy <ly.gracies@gmail.com> 1737054468 +0700	commit: refactor: lab ui, app icon
+8497cd55effc6d11770e38f20b0a73215e7a7dc8 8497cd55effc6d11770e38f20b0a73215e7a7dc8 gracialy <ly.gracies@gmail.com> 1737106352 +0700	reset: moving to HEAD

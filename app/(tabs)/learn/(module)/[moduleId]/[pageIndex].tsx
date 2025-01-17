@@ -1,9 +1,8 @@
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { modules } from '@/data/modules';
 import { Button } from '@/components/Button';
 import { theme } from '@/constants/Theme';
-import { Ionicons } from '@expo/vector-icons';
 import { FormattedText } from '@/components/FormattedText';
 import { ContentSection } from '@/types/module';
 import { updateProgress, getModuleProgress } from '@/lib/progress';
@@ -45,7 +44,7 @@ export default function ModulePage() {
     }
     router.replace('/learn');
   };
-  
+
   // Update progress bar calculation
   const progressPercentage = Math.round(((currentPageIndex + 1) / (module?.pages.length || 1)) * 100);
 
@@ -63,18 +62,18 @@ export default function ModulePage() {
   return (
     <View style={styles.outerContainer}>
       <View style={styles.innerContainer}>
-      <ScrollView 
+        <ScrollView
           style={styles.content}
           contentContainerStyle={styles.contentContainer} // Add this
         >
           <View style={styles.progressCard}>
             <Text style={styles.moduleTitle}>{module.title}</Text>
             <View style={styles.progressBar}>
-              <View 
+              <View
                 style={[
-                  styles.progressFill, 
+                  styles.progressFill,
                   { width: `${progressPercentage}%` }
-                ]} 
+                ]}
               />
             </View>
             <Text style={styles.progressText}>
@@ -84,7 +83,7 @@ export default function ModulePage() {
 
           <View style={styles.contentCard}>
             <Text style={styles.pageTitle}>{currentPage.title}</Text>
-            
+
             {Array.isArray(currentPage.content) ? (
               currentPage.content.map((section: ContentSection, index: number) => (
                 <View key={index} style={styles.section}>
@@ -111,26 +110,56 @@ export default function ModulePage() {
 
         <View style={styles.navigationContainer}>
           {hasPrevPage && (
-            <Button 
+            <Button
               title="Previous"
               variant="secondary"
               onPress={() => router.push(`/learn/(module)/${moduleId}/${currentPageIndex - 1}`)}
-              icon={<Ionicons name="arrow-back" size={20} color={theme.colors.primary} />}
+              icon={
+                <Image
+                  source={require('@/assets/images/arrow-left.svg')}
+                  style={{
+                    width: 20,
+                    height: 20,
+                    tintColor: theme.colors.primary,
+                    marginRight: theme.spacing.sm
+                  }}
+                />
+              }
             />
           )}
           <View style={styles.spacer} />
           {isLastPage ? (
-            <Button 
+            <Button
               title="Complete"
               onPress={handleComplete}
-              icon={<Ionicons name="checkmark" size={20} color="white" />}
+              icon={
+                <Image
+                  source={require('@/assets/images/checkmark.svg')}
+                  style={{
+                    width: 20,
+                    height: 20,
+                    tintColor: 'white',
+                    marginLeft: theme.spacing.sm
+                  }}
+                />
+              }
               iconPosition="right"
             />
           ) : (
-            <Button 
+            <Button
               title="Next"
               onPress={() => router.push(`/learn/(module)/${moduleId}/${currentPageIndex + 1}`)}
-              icon={<Ionicons name="arrow-forward" size={20} color="white" />}
+              icon={
+                <Image
+                  source={require('@/assets/images/arrow-right.svg')}
+                  style={{
+                    width: 20,
+                    height: 20,
+                    tintColor: 'white',
+                    marginLeft: theme.spacing.sm
+                  }}
+                />
+              }
               iconPosition="right"
             />
           )}
@@ -227,7 +256,7 @@ const styles = StyleSheet.create({
   },
   navigationContainer: {
     flexDirection: 'row',
-    paddingVertical: theme.spacing.md, 
+    paddingVertical: theme.spacing.md,
     paddingHorizontal: theme.spacing.lg,
     borderTopWidth: 1,
     borderTopColor: '#E5E7EB',

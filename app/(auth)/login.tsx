@@ -3,8 +3,8 @@ import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { router } from 'expo-router';
 import { theme } from '@/constants/Theme';
 import { Button } from '@/components/Button';
-import { Input } from '@/components/Input';
 import { supabase } from '@/lib/supabase';
+import { Input } from '@/components/Input';
 
 export default function Login() {
   const [email, setEmail] = useState('');
